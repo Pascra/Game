@@ -32,7 +32,7 @@ F11 (cap fps limit to 30)
 
 _0.5 version features:_
 
-* Make github web page
+* Make github page
 * Map and player assets
 * Physics
 * Implementation of some debug keys
