@@ -1,6 +1,6 @@
 # 2D Platformer
 
-* Github wiki of the project: https://github.com/Pascra/Game-Analysis-Pac-Man/wiki
+* Github wiki of the project:
 * Project web: 
 
 ## About the game
