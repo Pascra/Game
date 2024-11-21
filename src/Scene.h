@@ -37,4 +37,8 @@ private:
 
 	//L03: TODO 3b: Declare a Player attribute
 	Player* player;
+
+	bool LoadState();
+	pugi::xml_document configFile;
+	SDL_Texture* texture;
 };

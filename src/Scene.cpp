@@ -96,3 +96,30 @@ bool Scene::CleanUp()
 
 	return true;
 }
+
+bool Scene::LoadState() {
+	pugi::xml_parse_result result = configFile.load_file("config.xml");
+	if (!result)
+	{
+		LOG("Failed to load config.xml: %s", result.description());
+		return false;
+	}
+	pugi::xml_node playerNode = configFile.child("player");
+
+	if (!playerNode)
+	{
+		LOG("Player data not found in config.xml");
+		return false;
+	}
+	int playerX = playerNode.child("x").text().as_int();
+	int playerY = playerNode.child("y").text().as_int();
+
+	if (player)
+	{
+		player->position = Vector2D(playerX, playerY);
+	}
+	texture = Engine::GetInstance().render.get()->LoadTexture("Assets/Textures/player1.png");
+
+	return true;
+
+}

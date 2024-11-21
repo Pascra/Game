@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Render.h"
 #include "Log.h"
+#include "SDL2/SDL_image.h"
 
 #define VSYNC true
 
@@ -225,4 +226,17 @@ bool Render::DrawCircle(int x, int y, int radius, Uint8 r, Uint8 g, Uint8 b, Uin
 	}
 
 	return ret;
+}
+SDL_Texture* Render::LoadTexture(const char* path)
+{
+	// Cargar la textura usando SDL_image
+	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
+
+	// Verificar si hubo algún error al cargar la textura
+	if (texture == nullptr)
+	{
+		LOG("Unable to load texture from %s! SDL_image Error: %s\n", path, IMG_GetError());
+	}
+
+	return texture;
 }

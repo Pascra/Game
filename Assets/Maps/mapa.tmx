@@ -4185,9 +4185,9 @@
    <tile gid="18"/>
    <tile gid="18"/>
    <tile gid="18"/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="18"/>
+   <tile gid="18"/>
+   <tile gid="18"/>
    <tile gid="81"/>
    <tile/>
    <tile gid="83"/>

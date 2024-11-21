@@ -38,6 +38,7 @@ public:
 
 	// Set background color
 	void SetBackgroundColor(SDL_Color color);
+	SDL_Texture* LoadTexture(const char* path);
 
 public:
 
