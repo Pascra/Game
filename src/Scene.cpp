@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Item.h"
+#include "pugixml.hpp"
 
 Scene::Scene() : Module()
 {
@@ -53,26 +54,15 @@ bool Scene::PreUpdate()
 }
 
 // Called each loop iteration
-bool Scene::Update(float dt)
-{
-	//L03 TODO 3: Make the camera movement independent of framerate
+bool Scene::Update(float dt) {
+	LOG("Before Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
+
 	float camSpeed = 1;
 	Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
 	Engine::GetInstance().render.get()->camera.y = -(player->position.getY() - 400);
 
-	/*
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
-		Engine::GetInstance().render.get()->camera.y -= ceil(camSpeed * dt);
+	LOG("After Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
-		Engine::GetInstance().render.get()->camera.y += ceil(camSpeed * dt);
-
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
-		Engine::GetInstance().render.get()->camera.x -= ceil(camSpeed * dt);
-
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-		Engine::GetInstance().render.get()->camera.x += ceil(camSpeed * dt);
-	*/
 	return true;
 }
 
@@ -81,8 +71,20 @@ bool Scene::PostUpdate()
 {
 	bool ret = true;
 
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F5) == KEY_DOWN)
+	{
+		SaveState();  // Guardar en f5
+		LOG("Game state saved.");
+	}
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F6) == KEY_DOWN)
+	{
+		LoadState();  // cargar f6
+		LOG("Game state loaded.");
+	}
+
 	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
+	
 
 	return ret;
 }
@@ -98,28 +100,66 @@ bool Scene::CleanUp()
 }
 
 bool Scene::LoadState() {
-	pugi::xml_parse_result result = configFile.load_file("config.xml");
-	if (!result)
-	{
-		LOG("Failed to load config.xml: %s", result.description());
+	pugi::xml_parse_result result = configFile.load_file("save.xml");
+	if (!result) {
+		LOG("Failed to load save.xml: %s", result.description());
 		return false;
 	}
-	pugi::xml_node playerNode = configFile.child("player");
 
-	if (!playerNode)
-	{
-		LOG("Player data not found in config.xml");
+	pugi::xml_node playerNode = configFile.child("game").child("player");
+	if (!playerNode) {
+		LOG("Player data not found in save.xml");
 		return false;
 	}
+
 	int playerX = playerNode.child("x").text().as_int();
 	int playerY = playerNode.child("y").text().as_int();
 
-	if (player)
-	{
+	LOG("Loaded player position: (%d, %d)", playerX, playerY);
+
+	if (player) {
 		player->position = Vector2D(playerX, playerY);
+		LOG("Player position set to: (%d, %d)", player->position.getX(), player->position.getY());
 	}
-	texture = Engine::GetInstance().render.get()->LoadTexture("Assets/Textures/player1.png");
+
+	// Forzar la cámara a moverse a la posición correcta
+	Engine::GetInstance().render.get()->camera.x = -(playerX - 200);
+	Engine::GetInstance().render.get()->camera.y = -(playerY - 400);
 
 	return true;
+}
 
+bool Scene::SaveState() {
+	pugi::xml_document doc;
+
+	pugi::xml_parse_result result = doc.load_file("save.xml");
+
+	if (!result)
+	{
+		LOG("Failed to load save.xml, creating a new one.");
+	}
+
+	pugi::xml_node rootNode = doc.child("game");
+	if (!rootNode)
+	{
+		rootNode = doc.append_child("game");
+	}
+
+	pugi::xml_node playerNode = rootNode.child("player");
+	if (!playerNode)
+	{
+		playerNode = rootNode.append_child("player");
+	}
+
+	// Limpia los valores previos
+	playerNode.remove_children();
+
+	// Guarda la posición actual del jugador
+	playerNode.append_child("x").text().set(player->position.getX());
+	playerNode.append_child("y").text().set(player->position.getY());
+
+	doc.save_file("save.xml");
+
+	LOG("Game state saved: (%d, %d)", player->position.getX(), player->position.getY());
+	return true;
 }

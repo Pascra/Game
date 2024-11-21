@@ -39,6 +39,7 @@ private:
 	Player* player;
 
 	bool LoadState();
+	bool SaveState();
 	pugi::xml_document configFile;
 	SDL_Texture* texture;
 };

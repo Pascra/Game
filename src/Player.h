@@ -3,42 +3,44 @@
 #include "Entity.h"
 #include "SDL2/SDL.h"
 #include "Box2D/Box2D.h"
+#include "Vector2D.h"
 
 struct SDL_Texture;
 
 class Player : public Entity
 {
 public:
+    Player();
+    virtual ~Player();
 
-	Player();
-	
-	virtual ~Player();
+    bool Awake();
+    bool Start();
+    bool Update(float dt);
+    bool CleanUp();
 
-	bool Awake();
+    // Define funciones de colisión
+    void OnCollision(PhysBody* physA, PhysBody* physB);
+    void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
 
-	bool Start();
-
-	bool Update(float dt);
-
-	bool CleanUp();
-
-	// L08 TODO 6: Define OnCollision function for the player. 
-	void OnCollision(PhysBody* physA, PhysBody* physB);
-
-	void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
+    // Sincroniza la posición lógica con el cuerpo físico
+    void SyncPhysicsToPosition();
 
 public:
+    // Declaración de parámetros del jugador
+    float speed = 5.0f;
+    SDL_Texture* texture = nullptr;
+    int texW = 0, texH = 0;
 
-	//Declare player parameters
-	float speed = 5.0f;
-	SDL_Texture* texture = NULL;
-	int texW, texH;
+    // Cuerpo físico del jugador
+    PhysBody* pbody = nullptr;
 
-	//Audio fx
-	int pickCoinFxId;
+    // Posición lógica del jugador
+    Vector2D position;
 
-	// L08 TODO 5: Add physics to the player - declare a Physics body
-	PhysBody* pbody;
-	float jumpForce = 2.5f; // The force to apply when jumping
-	bool isJumping = false; // Flag to check if the player is currently jumping
+    // Parámetros de salto
+    float jumpForce = 2.5f; // Fuerza de salto
+    bool isJumping = false; // Estado del salto
+
+    // ID del efecto de sonido
+    int pickCoinFxId = -1;
 };

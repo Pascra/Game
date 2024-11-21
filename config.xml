@@ -1,5 +1,6 @@
 <!-- Config file for the engine -->
 <config>
+	
   <engine>
     <title>My platformer game</title>
     <maxFrameDuration value="16"/>
