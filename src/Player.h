@@ -23,8 +23,13 @@ public:
     void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
 
     // Sincroniza la posición lógica con el cuerpo físico
-    void SyncPhysicsToPosition();
-
+  
+    void SetPosition(Vector2D pos);
+    Vector2D GetPosition();
+    void SetParameters(pugi::xml_node parameters) {
+        this->parameters = parameters;
+    }
+   
 public:
     // Declaración de parámetros del jugador
     float speed = 5.0f;
@@ -43,4 +48,7 @@ public:
 
     // ID del efecto de sonido
     int pickCoinFxId = -1;
+
+    
+    pugi::xml_node parameters;
 };

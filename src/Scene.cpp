@@ -12,6 +12,10 @@
 #include "Map.h"
 #include "Item.h"
 #include "pugixml.hpp"
+#include "Physics.h"  
+
+
+
 
 Scene::Scene() : Module()
 {
@@ -99,67 +103,66 @@ bool Scene::CleanUp()
 	return true;
 }
 
-bool Scene::LoadState() {
-	pugi::xml_parse_result result = configFile.load_file("save.xml");
+void Scene::LoadState() {
+	pugi::xml_document loadFile;
+	pugi::xml_parse_result result = loadFile.load_file("config.xml");
+
 	if (!result) {
-		LOG("Failed to load save.xml: %s", result.description());
-		return false;
+		LOG("Error loading config.xml: %s", result.description());
+		return;
 	}
 
-	pugi::xml_node playerNode = configFile.child("game").child("player");
-	if (!playerNode) {
-		LOG("Player data not found in save.xml");
-		return false;
-	}
+	// Obtener la posición guardada en el XML
+	Vector2D posPlayer;
+	posPlayer.setX(loadFile.child("config").child("scene").child("entities").child("player").attribute("x").as_int());
+	posPlayer.setY(loadFile.child("config").child("scene").child("entities").child("player").attribute("y").as_int());
 
-	int playerX = playerNode.child("x").text().as_int();
-	int playerY = playerNode.child("y").text().as_int();
+	// Asignar la posición al jugador
+	player->SetPosition(posPlayer);
 
-	LOG("Loaded player position: (%d, %d)", playerX, playerY);
-
-	if (player) {
-		player->position = Vector2D(playerX, playerY);
-		LOG("Player position set to: (%d, %d)", player->position.getX(), player->position.getY());
-	}
-
-	// Forzar la cámara a moverse a la posición correcta
-	Engine::GetInstance().render.get()->camera.x = -(playerX - 200);
-	Engine::GetInstance().render.get()->camera.y = -(playerY - 400);
-
-	return true;
+	LOG("Loaded Player Position: (%d, %d)", posPlayer.getX(), posPlayer.getY());
 }
 
-bool Scene::SaveState() {
-	pugi::xml_document doc;
 
-	pugi::xml_parse_result result = doc.load_file("save.xml");
 
-	if (!result)
+
+void Scene::SaveState() {
+
+	pugi::xml_document loadFile;
+	pugi::xml_parse_result result = loadFile.load_file("config.xml");
+
+	if (result == NULL)
 	{
-		LOG("Failed to load save.xml, creating a new one.");
+		LOG("Could not load file. Pugi error: %s", result.description());
+		return;
 	}
 
-	pugi::xml_node rootNode = doc.child("game");
-	if (!rootNode)
-	{
-		rootNode = doc.append_child("game");
-	}
+	pugi::xml_node sceneNode = loadFile.child("config").child("scene");
 
-	pugi::xml_node playerNode = rootNode.child("player");
-	if (!playerNode)
-	{
-		playerNode = rootNode.append_child("player");
-	}
+	//Save info to XML 
 
-	// Limpia los valores previos
-	playerNode.remove_children();
+	//Player position
+	sceneNode.child("entities").child("player").attribute("x").set_value(player->GetPosition().getX());
+	sceneNode.child("entities").child("player").attribute("y").set_value(player->GetPosition().getY());
 
-	// Guarda la posición actual del jugador
-	playerNode.append_child("x").text().set(player->position.getX());
-	playerNode.append_child("y").text().set(player->position.getY());
+	//enemies
+	// ...
 
-	doc.save_file("save.xml");
-
-	LOG("Game state saved: (%d, %d)", player->position.getX(), player->position.getY());
-	return true;
+	//Saves the modifications to the XML 
+	loadFile.save_file("config.xml");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

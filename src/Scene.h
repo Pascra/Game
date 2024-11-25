@@ -19,7 +19,7 @@ public:
 
 	// Called before the first frame
 	bool Start();
-
+	
 	// Called before all Updates
 	bool PreUpdate();
 
@@ -38,8 +38,8 @@ private:
 	//L03: TODO 3b: Declare a Player attribute
 	Player* player;
 
-	bool LoadState();
-	bool SaveState();
+	void LoadState();
+	void SaveState();
 	pugi::xml_document configFile;
 	SDL_Texture* texture;
 };
