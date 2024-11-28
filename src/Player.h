@@ -52,3 +52,4 @@ public:
     
     pugi::xml_node parameters;
 };
+

@@ -112,45 +112,55 @@ void Scene::LoadState() {
 		return;
 	}
 
-	// Obtener la posición guardada en el XML
-	Vector2D posPlayer;
-	posPlayer.setX(loadFile.child("config").child("scene").child("entities").child("player").attribute("x").as_int());
-	posPlayer.setY(loadFile.child("config").child("scene").child("entities").child("player").attribute("y").as_int());
+	// Acceder correctamente al nodo <game><player> para obtener la posición
+	pugi::xml_node playerNode = loadFile.child("game").child("player");
 
-	// Asignar la posición al jugador
-	player->SetPosition(posPlayer);
+	if (playerNode) {
+		Vector2D posPlayer;
+		posPlayer.setX(playerNode.child("x").text().as_int());
+		posPlayer.setY(playerNode.child("y").text().as_int());
 
-	LOG("Loaded Player Position: (%d, %d)", posPlayer.getX(), posPlayer.getY());
+		// Asignar la posición al jugador
+		player->SetPosition(posPlayer);
+
+		LOG("Loaded Player Position: (%d, %d)", posPlayer.getX(), posPlayer.getY());
+	}
+	else {
+		LOG("Player node not found in config.xml");
+	}
 }
+
 
 
 
 
 void Scene::SaveState() {
-
 	pugi::xml_document loadFile;
 	pugi::xml_parse_result result = loadFile.load_file("config.xml");
 
-	if (result == NULL)
-	{
+	if (!result) {
 		LOG("Could not load file. Pugi error: %s", result.description());
 		return;
 	}
 
-	pugi::xml_node sceneNode = loadFile.child("config").child("scene");
+	// Acceder al nodo <game><player> para guardar la posición
+	pugi::xml_node playerNode = loadFile.child("game").child("player");
 
-	//Save info to XML 
+	if (playerNode) {
+		// Guardar la posición actual del jugador
+		playerNode.child("x").text().set(player->GetPosition().getX());
+		playerNode.child("y").text().set(player->GetPosition().getY());
+	}
+	else {
+		LOG("Player node not found in config.xml");
+		return;
+	}
 
-	//Player position
-	sceneNode.child("entities").child("player").attribute("x").set_value(player->GetPosition().getX());
-	sceneNode.child("entities").child("player").attribute("y").set_value(player->GetPosition().getY());
-
-	//enemies
-	// ...
-
-	//Saves the modifications to the XML 
+	// Guardar cambios en el archivo XML
 	loadFile.save_file("config.xml");
+	LOG("Saved Player Position: (%d, %d)", player->GetPosition().getX(), player->GetPosition().getY());
 }
+
 
 
 
