@@ -2,6 +2,8 @@
 
 #include "Module.h"
 #include "Player.h"
+#include "Enemy.h"
+#include <vector>
 
 struct SDL_Texture;
 
@@ -32,14 +34,25 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	Vector2D GetPlayerPosition();
+
 private:
 	SDL_Texture* img;
 
 	//L03: TODO 3b: Declare a Player attribute
 	Player* player;
+	std::vector<Enemy*> enemyList;
 
 	void LoadState();
 	void SaveState();
 	pugi::xml_document configFile;
 	SDL_Texture* texture;
+	SDL_Texture* mouseTileTex = nullptr;
+	std::string tilePosDebug = "[0,0]";
+	bool once = false;
+
+	
+	
+
+	
 };

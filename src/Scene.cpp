@@ -35,10 +35,19 @@ bool Scene::Awake()
 
 	//L04: TODO 3b: Instantiate the player using the entity manager
 	player = (Player*)Engine::GetInstance().entityManager->CreateEntity(EntityType::PLAYER);
-	
+
 	//L08 Create a new item using the entity manager and set the position to (200, 672) to test
-	Item* item = (Item*) Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+	Item* item = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
 	item->position = Vector2D(200, 672);
+
+	// Create a enemy using the entity manager 
+	for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy"); enemyNode; enemyNode = enemyNode.next_sibling("enemy"))
+	{
+		Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
+		enemy->SetParameters(enemyNode);
+		enemyList.push_back(enemy);
+	}
+
 	return ret;
 }
 
@@ -67,6 +76,31 @@ bool Scene::Update(float dt) {
 
 	LOG("After Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
+	//Get mouse position and obtain the map coordinate
+	int scale = Engine::GetInstance().window.get()->GetScale();
+	Vector2D mousePos = Engine::GetInstance().input.get()->GetMousePosition();
+	Vector2D mouseTile = Engine::GetInstance().map.get()->WorldToMap(mousePos.getX() - Engine::GetInstance().render.get()->camera.x / scale,
+		mousePos.getY() - Engine::GetInstance().render.get()->camera.y / scale);
+
+	//Render a texture where the mouse is over to highlight the tile, use the texture 'mouseTileTex'
+	Vector2D highlightTile = Engine::GetInstance().map.get()->MapToWorld(mouseTile.getX(), mouseTile.getY());
+	SDL_Rect rect = { 0,0,32,32 };
+	Engine::GetInstance().render.get()->DrawTexture(mouseTileTex,
+		highlightTile.getX(),
+		highlightTile.getY(),
+		&rect);
+
+	// saves the tile pos for debugging purposes
+	if (mouseTile.getX() >= 0 && mouseTile.getY() >= 0 || once) {
+		tilePosDebug = "[" + std::to_string((int)mouseTile.getX()) + "," + std::to_string((int)mouseTile.getY()) + "] ";
+	}
+
+	//If mouse button is pressed modify enemy position
+	if (Engine::GetInstance().input.get()->GetMouseButtonDown(1) == KEY_DOWN) {
+		enemyList[0]->SetPosition(Vector2D(highlightTile.getX(), highlightTile.getY()));
+		enemyList[0]->ResetPath();
+	}
+
 	return true;
 }
 
@@ -86,9 +120,9 @@ bool Scene::PostUpdate()
 		LOG("Game state loaded.");
 	}
 
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
-	
+
 
 	return ret;
 }
@@ -161,7 +195,11 @@ void Scene::SaveState() {
 	LOG("Saved Player Position: (%d, %d)", player->GetPosition().getX(), player->GetPosition().getY());
 }
 
-
+// Return the player position
+Vector2D Scene::GetPlayerPosition()
+{
+	return player->GetPosition();
+}
 
 
 

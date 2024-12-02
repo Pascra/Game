@@ -7,7 +7,8 @@ enum class EntityType
 {
 	PLAYER,
 	ITEM,
-	UNKNOWN
+	UNKNOWN,
+	ENEMY
 };
 
 class PhysBody;
@@ -63,12 +64,16 @@ public:
 	virtual void OnCollisionEnd(PhysBody* physA, PhysBody* physB) {
 
 	};
+	void SetParameters(pugi::xml_node parameters) {
+		this->parameters = parameters;
+	}
 
 public:
 
 	std::string name;
 	EntityType type;
 	bool active = true;
+	pugi::xml_node parameters;
 
 	// Possible properties, it depends on how generic we
 	// want our Entity class, maybe it's not renderable...
