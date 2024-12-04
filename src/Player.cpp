@@ -8,31 +8,24 @@
 #include "Log.h"
 #include "Physics.h"
 
-
 Player::Player() : Entity(EntityType::PLAYER)
 {
 	name = "Player";
-	
 }
 
-Player::~Player() {
+Player::~Player() {}
 
-}
-
-bool Player::Awake() {
-
+bool Player::Awake()
+{
 	//L03: TODO 2: Initialize Player parameters
 	position = Vector2D(0, 0);
 	return true;
 }
 
-bool Player::Start() {
-
+bool Player::Start()
+{
 	//L03: TODO 2: Initialize Player parameters
 	texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/player1.png");
-	
-
-
 
 	// L08 TODO 5: Add physics to the player - initialize physics body
 	Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
@@ -44,8 +37,12 @@ bool Player::Start() {
 	// L08 TODO 7: Assign collider type
 	pbody->ctype = ColliderType::PLAYER;
 
-	//initialize audio effect
+	// Initialize audio effect
 	pickCoinFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/retro-video-game-coin-pickup-38299.ogg");
+
+	// Set initial position
+	initialPosition = Vector2D(50, 50); // Adjust to your initial map position
+	SetPosition(initialPosition);
 
 	return true;
 }
@@ -56,24 +53,27 @@ bool Player::Update(float dt)
 	b2Vec2 velocity = b2Vec2(0, pbody->body->GetLinearVelocity().y);
 
 	// Move left
-	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+	{
 		velocity.x = -0.2 * dt;
 	}
 
 	// Move right
-	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+	{
 		velocity.x = 0.2 * dt;
 	}
-	
-	//Jump
-	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
+
+	// Jump
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false)
+	{
 		// Apply an initial upward force
 		pbody->body->ApplyLinearImpulseToCenter(b2Vec2(0, -jumpForce), true);
 		isJumping = true;
 	}
 
-	// If the player is jumpling, we don't want to apply gravity, we use the current velocity prduced by the jump
-	if(isJumping == true)
+	// If the player is jumping, we don't want to apply gravity; we use the current velocity produced by the jump
+	if (isJumping == true)
 	{
 		velocity.y = pbody->body->GetLinearVelocity().y;
 	}
@@ -81,9 +81,16 @@ bool Player::Update(float dt)
 	// Apply the velocity to the player
 	pbody->body->SetLinearVelocity(velocity);
 
+	// Update player position based on physics body
 	b2Transform pbodyPos = pbody->body->GetTransform();
 	position.setX(METERS_TO_PIXELS(pbodyPos.p.x) - texH / 2);
 	position.setY(METERS_TO_PIXELS(pbodyPos.p.y) - texH / 2);
+
+	// Check if player has fallen below a certain height
+	if (position.getY() > 1000) // Adjust this value as needed
+	{
+		ResetToInitialPosition();
+	}
 
 	Engine::GetInstance().render.get()->DrawTexture(texture, (int)position.getX(), (int)position.getY());
 	return true;
@@ -97,12 +104,13 @@ bool Player::CleanUp()
 }
 
 // L08 TODO 6: Define OnCollision function for the player. 
-void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
+void Player::OnCollision(PhysBody* physA, PhysBody* physB)
+{
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
 		LOG("Collision PLATFORM");
-		//reset the jump flag when touching the ground
+		// Reset the jump flag when touching the ground
 		isJumping = false;
 		break;
 	case ColliderType::ITEM:
@@ -134,12 +142,24 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 		break;
 	}
 }
-void Player::SetPosition(Vector2D pos) {
-    b2Vec2 bodyPos = b2Vec2(PIXEL_TO_METERS(pos.getX()), PIXEL_TO_METERS(pos.getY()));
-    pbody->body->SetTransform(bodyPos, 0);
+
+void Player::SetPosition(Vector2D pos)
+{
+	b2Vec2 bodyPos = b2Vec2(PIXEL_TO_METERS(pos.getX()), PIXEL_TO_METERS(pos.getY()));
+	pbody->body->SetTransform(bodyPos, 0);
 }
-Vector2D Player::GetPosition() {
+
+Vector2D Player::GetPosition()
+{
 	b2Vec2 bodyPos = pbody->body->GetTransform().p;
 	Vector2D pos = Vector2D(METERS_TO_PIXELS(bodyPos.x), METERS_TO_PIXELS(bodyPos.y));
 	return pos;
+}
+
+void Player::ResetToInitialPosition()
+{
+	LOG("Player died and respawned.");
+	SetPosition(initialPosition);
+	isJumping = false;
+	pbody->body->SetLinearVelocity(b2Vec2(0, 0)); // Reset velocity
 }
