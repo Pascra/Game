@@ -4,46 +4,58 @@
 #include "Vector2D.h"
 #include "SDL2/SDL.h"
 
+// Render module for managing 2D drawing with SDL
 class Render : public Module
 {
 public:
+    Render();
 
-	Render();
+    // Destructor
+    virtual ~Render();
 
-	// Destructor
-	virtual ~Render();
+    // Called before render is available
+    bool Awake();
 
-	// Called before render is available
-	bool Awake();
+    // Called before the first frame
+    bool Start();
 
-	// Called before the first frame
-	bool Start();
+    // Called each loop iteration
+    bool PreUpdate();
+    bool Update(float dt);
+    bool PostUpdate();
 
-	// Called each loop iteration
-	bool PreUpdate();
-	bool Update(float dt);
-	bool PostUpdate();
+    // Called before quitting
+    bool CleanUp();
 
-	// Called before quitting
-	bool CleanUp();
+    // Set the viewport for rendering
+    void SetViewPort(const SDL_Rect& rect);
 
-	void SetViewPort(const SDL_Rect& rect);
-	void ResetViewPort();
+    // Reset viewport to full screen
+    void ResetViewPort();
 
-	// Drawing
-	bool DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = NULL, float speed = 1.0f, double angle = 0, int pivotX = INT_MAX, int pivotY = INT_MAX) const;
-	bool DrawRectangle(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool filled = true, bool useCamera = true) const;
-	bool DrawLine(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool useCamera = true) const;
-	bool DrawCircle(int x1, int y1, int redius, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool useCamera = true) const;
+    // Draw a texture to the screen
+    bool DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = nullptr, float speed = 1.0f, double angle = 0, int pivotX = INT_MAX, int pivotY = INT_MAX) const;
 
-	// Set background color
-	void SetBackgroundColor(SDL_Color color);
-	SDL_Texture* LoadTexture(const char* path);
+    // Draw a rectangle to the screen
+    bool DrawRectangle(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool filled = true, bool useCamera = true) const;
+
+    // Draw a line to the screen
+    bool DrawLine(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool useCamera = true) const;
+
+    // Draw a circle to the screen
+    bool DrawCircle(int x1, int y1, int radius, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool useCamera = true) const;
+
+    // Set the background color of the renderer
+    void SetBackgroundColor(SDL_Color color);
+
+    // Load a texture from a file
+    SDL_Texture* LoadTexture(const char* path);
+
+    
 
 public:
-
-	SDL_Renderer* renderer;
-	SDL_Rect camera;
-	SDL_Rect viewport;
-	SDL_Color background;
+    SDL_Renderer* renderer = nullptr; // SDL renderer for 2D drawing
+    SDL_Rect camera;                 // Camera rectangle for rendering
+    SDL_Rect viewport;               // Viewport for the renderer
+    SDL_Color background = { 0, 0, 0, 255 }; // Background color
 };

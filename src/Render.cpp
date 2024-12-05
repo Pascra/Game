@@ -8,11 +8,12 @@
 
 Render::Render() : Module()
 {
-	name = "render";
-	background.r = 0;
-	background.g = 0;
-	background.b = 0;
-	background.a = 0;
+    name = "render";
+    background.r = 0;
+    background.g = 0;
+    background.b = 0;
+    background.a = 255; // Fondo opaco
+    renderer = nullptr;
 }
 
 // Destructor
@@ -22,221 +23,303 @@ Render::~Render()
 // Called before render is available
 bool Render::Awake()
 {
-	LOG("Create SDL rendering context");
-	bool ret = true;
+    //añadir color al fondo 
 
-	Uint32 flags = SDL_RENDERER_ACCELERATED;
+    background.r = 135; // Rojo
+    background.g = 206; // Verde
+    background.b = 235; // Azul
+    background.a = 255; // Opacidad
 
-	//L05 TODO 5 - Load the configuration of the Render module
-	if (configParameters.child("vsync").attribute("value").as_bool() == true) {
-		flags |= SDL_RENDERER_PRESENTVSYNC;
-		LOG("Using vsync");
-	}
-	int scale = Engine::GetInstance().window.get()->GetScale();
+    camera.w = Engine::GetInstance().window.get()->width;
+    camera.h = Engine::GetInstance().window.get()->height;
 
-	SDL_Window* window = Engine::GetInstance().window.get()->window;
-	renderer = SDL_CreateRenderer(window, -1, flags);
+    LOG("Create SDL rendering context");
+    bool ret = true;
 
-	if(renderer == NULL)
-	{
-		LOG("Could not create the renderer! SDL_Error: %s\n", SDL_GetError());
-		ret = false;
-	}
-	else
-	{
-		camera.w = Engine::GetInstance().window.get()->width * scale;
-		camera.h = Engine::GetInstance().window.get()->height * scale;
-		camera.x = 0;
-		camera.y = 0;
-	}
+    Uint32 flags = SDL_RENDERER_ACCELERATED;
 
-	return ret;
+    // Cargar configuración de vsync
+    if (configParameters.child("vsync").attribute("value").as_bool() == true) {
+        flags |= SDL_RENDERER_PRESENTVSYNC;
+        LOG("Using vsync");
+    }
+
+    // Obtener escala de la ventana
+    int scale = Engine::GetInstance().window.get()->GetScale();
+
+    if (scale <= 0) {
+        LOG("Invalid scale detected in Render module, setting to 1.");
+        scale = 1;
+    }
+
+    // Crear el renderer utilizando la ventana SDL
+    SDL_Window* window = Engine::GetInstance().window.get()->GetSDLWindow(); // Asegúrate de que `GetSDLWindow()` esté implementado en `Window`
+    if (window == nullptr) {
+        LOG("SDL_Window is null! Cannot create renderer.");
+        return false;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, flags);
+
+    if (renderer == nullptr) {
+        LOG("Could not create the renderer! SDL_Error: %s", SDL_GetError());
+        ret = false;
+    }
+    else {
+        int width, height;
+        Engine::GetInstance().window.get()->GetWindowSize(width, height);
+
+        camera.w = width * scale;
+        camera.h = height * scale;
+        camera.x = 0;
+        camera.y = 0;
+    }
+
+    return ret;
 }
 
 // Called before the first frame
 bool Render::Start()
 {
-	LOG("render start");
-	// back background
-	SDL_RenderGetViewport(renderer, &viewport);
-	return true;
+    LOG("Render start");
+    if (renderer != nullptr) {
+        SDL_RenderGetViewport(renderer, &viewport);
+    }
+    return true;
 }
 
 // Called each loop iteration
 bool Render::PreUpdate()
 {
-	SDL_RenderClear(renderer);
-	return true;
+    if (renderer != nullptr) {
+        SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
+        SDL_RenderClear(renderer);
+    }
+    else {
+        LOG("Renderer is null in PreUpdate. Cannot clear the screen.");
+    }
+    return true;
 }
 
 bool Render::Update(float dt)
 {
-	return true;
+    return true;
 }
 
 bool Render::PostUpdate()
 {
-	SDL_SetRenderDrawColor(renderer, background.r, background.g, background.g, background.a);
-	SDL_RenderPresent(renderer);
-	return true;
+    if (renderer != nullptr) {
+        SDL_RenderPresent(renderer);
+    }
+    else {
+        LOG("Renderer is null in PostUpdate. Cannot present the screen.");
+    }
+    return true;
 }
 
 // Called before quitting
 bool Render::CleanUp()
 {
-	LOG("Destroying SDL render");
-	SDL_DestroyRenderer(renderer);
-	return true;
+    LOG("Destroying SDL render");
+
+    if (renderer != nullptr) {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+    }
+    return true;
 }
 
+// Set the background color
 void Render::SetBackgroundColor(SDL_Color color)
 {
-	background = color;
+    background = color;
 }
 
+// Set the viewport
 void Render::SetViewPort(const SDL_Rect& rect)
 {
-	SDL_RenderSetViewport(renderer, &rect);
+    if (renderer != nullptr) {
+        SDL_RenderSetViewport(renderer, &rect);
+    }
+    else {
+        LOG("Renderer is null. Cannot set viewport.");
+    }
 }
 
+// Reset the viewport
 void Render::ResetViewPort()
 {
-	SDL_RenderSetViewport(renderer, &viewport);
+    if (renderer != nullptr) {
+        SDL_RenderSetViewport(renderer, &viewport);
+    }
+    else {
+        LOG("Renderer is null. Cannot reset viewport.");
+    }
 }
 
-// Blit to screen
+// Draw a texture to the screen
 bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivotX, int pivotY) const
 {
-	bool ret = true;
-	int scale = Engine::GetInstance().window.get()->GetScale();
+    if (renderer == nullptr || texture == nullptr) {
+        LOG("Cannot draw texture. Renderer or texture is null.");
+        return false;
+    }
 
-	SDL_Rect rect;
-	rect.x = (int)(camera.x * speed) + x * scale;
-	rect.y = (int)(camera.y * speed) + y * scale;
+    int scale = Engine::GetInstance().window.get()->GetScale();
+    if (scale <= 0) scale = 1;
 
-	if(section != NULL)
-	{
-		rect.w = section->w;
-		rect.h = section->h;
-	}
-	else
-	{
-		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-	}
+    SDL_Rect rect;
+    rect.x = (int)(camera.x * speed) + x * scale;
+    rect.y = (int)(camera.y * speed) + y * scale;
 
-	rect.w *= scale;
-	rect.h *= scale;
+    if (section != nullptr) {
+        rect.w = section->w;
+        rect.h = section->h;
+    }
+    else {
+        SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+    }
 
-	SDL_Point* p = NULL;
-	SDL_Point pivot;
+    rect.w *= scale;
+    rect.h *= scale;
 
-	if(pivotX != INT_MAX && pivotY != INT_MAX)
-	{
-		pivot.x = pivotX;
-		pivot.y = pivotY;
-		p = &pivot;
-	}
+    SDL_Point* p = nullptr;
+    SDL_Point pivot;
 
-	if(SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
-	{
-		LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
-		ret = false;
-	}
+    if (pivotX != INT_MAX && pivotY != INT_MAX) {
+        pivot.x = pivotX;
+        pivot.y = pivotY;
+        p = &pivot;
+    }
 
-	return ret;
+    if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0) {
+        LOG("Cannot blit to screen. SDL_RenderCopyEx error: %s", SDL_GetError());
+        return false;
+    }
+
+    return true;
 }
 
+// Draw a rectangle
 bool Render::DrawRectangle(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool filled, bool use_camera) const
 {
-	bool ret = true;
-	int scale = Engine::GetInstance().window.get()->GetScale();
+    if (renderer == nullptr) {
+        LOG("Renderer is null. Cannot draw rectangle.");
+        return false;
+    }
 
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-	SDL_Rect rec(rect);
-	if(use_camera)
-	{
-		rec.x = (int)(camera.x + rect.x * scale);
-		rec.y = (int)(camera.y + rect.y * scale);
-		rec.w *= scale;
-		rec.h *= scale;
-	}
+    SDL_Rect rec(rect);
+    if (use_camera) {
+        rec.x = (int)(camera.x + rect.x);
+        rec.y = (int)(camera.y + rect.y);
+    }
 
-	int result = (filled) ? SDL_RenderFillRect(renderer, &rec) : SDL_RenderDrawRect(renderer, &rec);
+    int result = (filled) ? SDL_RenderFillRect(renderer, &rec) : SDL_RenderDrawRect(renderer, &rec);
 
-	if(result != 0)
-	{
-		LOG("Cannot draw quad to screen. SDL_RenderFillRect error: %s", SDL_GetError());
-		ret = false;
-	}
+    if (result != 0) {
+        LOG("Cannot draw rectangle. SDL_RenderFillRect error: %s", SDL_GetError());
+        return false;
+    }
 
-	return ret;
+    return true;
 }
 
+// Load a texture
+SDL_Texture* Render::LoadTexture(const char* path)
+{
+    if (renderer == nullptr) {
+        LOG("Renderer is null. Cannot load texture.");
+        return nullptr;
+    }
+
+    SDL_Texture* texture = IMG_LoadTexture(renderer, path);
+    if (texture == nullptr) {
+        LOG("Unable to load texture from %s! SDL_image Error: %s", path, IMG_GetError());
+    }
+
+    return texture;
+}
 bool Render::DrawLine(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool use_camera) const
 {
-	bool ret = true;
-	int scale = Engine::GetInstance().window.get()->GetScale();
+    if (renderer == nullptr) {
+        LOG("Renderer is null. Cannot draw line.");
+        return false;
+    }
 
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-	int result = -1;
+    if (use_camera) {
+        x1 += camera.x;
+        y1 += camera.y;
+        x2 += camera.x;
+        y2 += camera.y;
+    }
 
-	if(use_camera)
-		result = SDL_RenderDrawLine(renderer, camera.x + x1 * scale, camera.y + y1 * scale, camera.x + x2 * scale, camera.y + y2 * scale);
-	else
-		result = SDL_RenderDrawLine(renderer, x1 * scale, y1 * scale, x2 * scale, y2 * scale);
+    int result = SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    if (result != 0) {
+        LOG("Cannot draw line. SDL_RenderDrawLine error: %s", SDL_GetError());
+        return false;
+    }
 
-	if(result != 0)
-	{
-		LOG("Cannot draw quad to screen. SDL_RenderFillRect error: %s", SDL_GetError());
-		ret = false;
-	}
-
-	return ret;
+    return true;
 }
 
 bool Render::DrawCircle(int x, int y, int radius, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool use_camera) const
 {
-	bool ret = true;
-	int scale = Engine::GetInstance().window.get()->GetScale();
+    if (renderer == nullptr) {
+        LOG("Renderer is null. Cannot draw circle.");
+        return false;
+    }
 
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-	int result = -1;
-	SDL_Point points[360];
+    const int diameter = (radius * 2);
+    int x_pos = (radius - 1);
+    int y_pos = 0;
+    int tx = 1;
+    int ty = 1;
+    int error = (tx - diameter);
 
-	float factor = (float)M_PI / 180.0f;
+    while (x_pos >= y_pos) {
+        // Draw 8 symmetrical points
+        if (use_camera) {
+            SDL_RenderDrawPoint(renderer, x + x_pos + camera.x, y - y_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x + x_pos + camera.x, y + y_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x - x_pos + camera.x, y - y_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x - x_pos + camera.x, y + y_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x + y_pos + camera.x, y - x_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x + y_pos + camera.x, y + x_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x - y_pos + camera.x, y - x_pos + camera.y);
+            SDL_RenderDrawPoint(renderer, x - y_pos + camera.x, y + x_pos + camera.y);
+        }
+        else {
+            SDL_RenderDrawPoint(renderer, x + x_pos, y - y_pos);
+            SDL_RenderDrawPoint(renderer, x + x_pos, y + y_pos);
+            SDL_RenderDrawPoint(renderer, x - x_pos, y - y_pos);
+            SDL_RenderDrawPoint(renderer, x - x_pos, y + y_pos);
+            SDL_RenderDrawPoint(renderer, x + y_pos, y - x_pos);
+            SDL_RenderDrawPoint(renderer, x + y_pos, y + x_pos);
+            SDL_RenderDrawPoint(renderer, x - y_pos, y - x_pos);
+            SDL_RenderDrawPoint(renderer, x - y_pos, y + x_pos);
+        }
 
-	for(int i = 0; i < 360; ++i)
-	{
-		points[i].x = (int)(x * scale + camera.x) + (int)(radius * cos(i * factor));
-		points[i].y = (int)(y * scale + camera.y) + (int)(radius * sin(i * factor));
-	}
+        if (error <= 0) {
+            ++y_pos;
+            error += ty;
+            ty += 2;
+        }
 
-	result = SDL_RenderDrawPoints(renderer, points, 360);
+        if (error > 0) {
+            --x_pos;
+            tx += 2;
+            error += (tx - diameter);
+        }
+    }
 
-	if(result != 0)
-	{
-		LOG("Cannot draw quad to screen. SDL_RenderFillRect error: %s", SDL_GetError());
-		ret = false;
-	}
-
-	return ret;
-}
-SDL_Texture* Render::LoadTexture(const char* path)
-{
-	// Cargar la textura usando SDL_image
-	SDL_Texture* texture = IMG_LoadTexture(renderer, path);
-
-	// Verificar si hubo algún error al cargar la textura
-	if (texture == nullptr)
-	{
-		LOG("Unable to load texture from %s! SDL_image Error: %s\n", path, IMG_GetError());
-	}
-
-	return texture;
+    return true;
 }
