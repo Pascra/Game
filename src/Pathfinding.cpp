@@ -135,7 +135,7 @@ void Pathfinding::DrawPath() {
 
 bool Pathfinding::IsWalkable(int x, int y) {
 
-    bool isWalkable = false;
+    bool isWalkable = true;
 
     // L11: TODO 3: return true only if x and y are within map limits
     // and the tile is walkable (tile id 0 in the navigation layer)

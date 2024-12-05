@@ -28,7 +28,7 @@ bool Scene::Awake()
 
     Item* item = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     item->position = Vector2D(200, 672);
-
+    // crear enemigo
     for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy"); enemyNode; enemyNode = enemyNode.next_sibling("enemy"))
     {
         Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
