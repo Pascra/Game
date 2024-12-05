@@ -94,7 +94,7 @@ bool Scene::PostUpdate()
         SaveState();
         LOG("Game state saved.");
     }
-    if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F6) == KEY_DOWN)
+    if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F6) == KEY_DOWN) 
     {
         LoadState();
         LOG("Game state loaded.");

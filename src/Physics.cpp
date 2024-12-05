@@ -10,6 +10,8 @@
 #include "Window.h"
 #include "box2D/box2d.h"
 
+
+
 Physics::Physics() : Module()
 {
 	// Initialise all the internal class variables, at least to NULL pointer
@@ -209,19 +211,30 @@ PhysBody* Physics::CreateChain(int x, int y, int* points, int size, bodyType typ
 	// Return our PhysBody class
 	return pbody;
 }
+int a = 1;
 
-// 
 bool Physics::PostUpdate()
 {
+	
+	if( a == 1) {
+		debug = !debug; 
+		a = a + 1;
+	}
 	bool ret = true;
 
+	
+	
 	// Activate or deactivate debug mode
-	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F1) == KEY_DOWN) {
+
 		debug = !debug;
+	}
+	
 	
 	//  Iterate all objects in the world and draw the bodies
 	if (debug)
 	{
+		
 		for (b2Body* b = world->GetBodyList(); b; b = b->GetNext())
 		{
 			for (b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
