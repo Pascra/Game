@@ -42,7 +42,7 @@
 				</item>
 			</items>
 			<enemies>
-				<enemy name="badguy" x="448" y="350" w="32" h="32" texture="Assets/Textures/enemy/Idle.png" gravity="true">
+				<enemy name="badguy" x="670" y="350" w="32" h="32" texture="Assets/Textures/enemy/Idle.png" gravity="true">
 					<animations>
 						<idle loop="true" speed="0.5">
 							<frame x="0" y="0" w="32" h="32" />
@@ -78,8 +78,7 @@
 </config>
 <game>
 	<player>
-		<x>2199</x>
-		<y>240</y>
+		<x>177</x>
+		<y>368</y>
 	</player>
 </game>
-
