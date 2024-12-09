@@ -49,6 +49,11 @@ bool Player::Start()
 
 bool Player::Update(float dt)
 {
+	if (pendingToReset) {
+		ResetToInitialPosition();
+		pendingToReset = false;
+	}
+
 	// L08 TODO 5: Add physics to the player - updated player position using physics
 	b2Vec2 velocity = b2Vec2(0, pbody->body->GetLinearVelocity().y);
 
@@ -118,6 +123,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
+		break;
+	case ColliderType::ENEMY:
+		LOG("Collision UNKNOWN");
+		pendingToReset = true;
 		break;
 	default:
 		break;

@@ -58,4 +58,6 @@ public:
 
     // Nueva variable: posición inicial del jugador
     Vector2D initialPosition;
+
+    bool pendingToReset = false;
 };
