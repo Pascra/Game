@@ -28,6 +28,7 @@ F6 (Load player position)
 F10 (God mode - doesn't work yet)
 F11 (cap fps limit to 30 - doesn't work well yet)
 k, j, n, m, b --> Show pathfindings
+MouseLeft_click (move enemy "badguy" position)
 
 ~~~~~~~~~~~~~~~
 
