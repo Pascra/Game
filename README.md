@@ -1,6 +1,6 @@
 # 2D Platformer
 
-* [Project's Github] 
+* [Project's Github] (https://github.com/Pascra/Game)
 * Github wiki of the project: 
 * Project web: 
 
