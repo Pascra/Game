@@ -21,6 +21,7 @@ bool Audio::Awake()
 	bool ret = true;
 	SDL_Init(0);
 
+
 	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
 		LOG("SDL_INIT_AUDIO could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -169,3 +170,4 @@ bool Audio::PlayFx(int id, int repeat)
 
 	return ret;
 }
+

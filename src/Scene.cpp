@@ -41,7 +41,11 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
+    Engine::GetInstance().audio.get()->PlayMusic("Assets/Audio/Music/Pixel10.ogg");
     Engine::GetInstance().map->Load("Assets/Maps/", "mapa.tmx");
+    birdsFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Birds.ogg");
+    Engine::GetInstance().audio.get()->PlayFx(birdsFxId);
+    
     return true;
 }
 

@@ -39,6 +39,10 @@ bool Player::Start()
 
 	// Initialize audio effect
 	pickCoinFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/retro-video-game-coin-pickup-38299.ogg");
+	jumpFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Salto.ogg");
+	fallFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Caer.ogg");
+	swordFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Espada.ogg");
+
 
 	// Set initial position
 	initialPosition = Vector2D(50, 50); // Adjust to your initial map position
@@ -72,6 +76,8 @@ bool Player::Update(float dt)
 	// Jump
 	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false)
 	{
+		LOG("It's Jumping");
+		Engine::GetInstance().audio.get()->PlayFx(jumpFxId);
 		// Apply an initial upward force
 		pbody->body->ApplyLinearImpulseToCenter(b2Vec2(0, -jumpForce), true);
 		isJumping = true;
@@ -97,9 +103,16 @@ bool Player::Update(float dt)
 		ResetToInitialPosition();
 	}
 
+	//Attack
+	if (Engine::GetInstance().input.get()->GetMouseButtonDown(SDL_SCANCODE_0) == KEY_DOWN) {
+		LOG("It's attacking");
+		Engine::GetInstance().audio.get()->PlayFx(swordFxId);
+	}
+
 	Engine::GetInstance().render.get()->DrawTexture(texture, (int)position.getX(), (int)position.getY());
 	return true;
 }
+
 
 bool Player::CleanUp()
 {
@@ -139,6 +152,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	{
 	case ColliderType::PLATFORM:
 		LOG("End Collision PLATFORM");
+		Engine::GetInstance().audio.get()->PlayFx(fallFxId);
 		break;
 	case ColliderType::ITEM:
 		LOG("End Collision ITEM");

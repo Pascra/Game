@@ -38,6 +38,8 @@ public:
     // Retrieve the player's current position
     Vector2D GetPlayerPosition();
 
+    int birdsFxId = -1;
+
 private:
     // Handle saving the game state
     void LoadState();

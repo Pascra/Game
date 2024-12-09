@@ -52,6 +52,10 @@ public:
 
     // ID del efecto de sonido
     int pickCoinFxId = -1;
+    int jumpFxId = -1;
+    int fallFxId = -1;
+    int swordFxId = -1;
+    
 
     // Nodo XML para parámetros del jugador
     pugi::xml_node parameters;
