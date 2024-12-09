@@ -1,6 +1,7 @@
 # 2D Platformer
 
-* Github wiki of the project:
+* [Project's Github] 
+* Github wiki of the project: 
 * Project web: 
 
 ## About the game
