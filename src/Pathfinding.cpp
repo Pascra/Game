@@ -135,7 +135,7 @@ void Pathfinding::DrawPath() {
 
 bool Pathfinding::IsWalkable(int x, int y) {
 
-    bool isWalkable = true;
+    bool isWalkable = false;
 
     // L11: TODO 3: return true only if x and y are within map limits
     // and the tile is walkable (tile id 0 in the navigation layer)
@@ -306,7 +306,7 @@ void Pathfinding::PropagateAStar(ASTAR_HEURISTICS heuristic) {
         for (const auto& neighbor : neighbors) {
 
             // the movement cost from the start point A to the current tile.
-            int g = costSoFar[(int)frontierTile.getX()][(int)frontierTile.getY()] + MovementCost((int)neighbor.getX(), (int)neighbor.getY());
+            int g = costSoFar[(int)frontierTile.getX()][(int)frontierTile.getY()] + 1;
 
             // the estimated movement cost from the current square to the destination point.
             int h = 0;

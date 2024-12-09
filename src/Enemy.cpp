@@ -119,7 +119,10 @@ bool Enemy::Update(float dt)
 	currentAnimation->Update();
 
 	// Draw pathfinding 
-	pathfinding->DrawPath();
+	
+		pathfinding->DrawPath();
+	
+	
 
 	return true;
 }

@@ -275,7 +275,7 @@ bool Map::LoadProperties(pugi::xml_node& node, Properties& properties)
         Properties::Property* prop = new Properties::Property();
         prop->name = propertieNode.attribute("name").as_string();
         prop->value = propertieNode.attribute("value").as_bool();
-        properties.PropertyList.push_back(prop);
+        properties.propertyList.push_back(prop);
 
     }
     return ret;
@@ -291,9 +291,23 @@ Vector2D Map::WorldToMap(int x, int y) {
 }
 MapLayer* Map::GetNavigationLayer() {
     for (const auto& layer : mapData.layers) {
-        if (layer->properties.GetProperty("Navigation") != NULL &&
-            layer->properties.GetProperty("Navigation")->value) {
+        //if (layer->properties.GetProperty("Navigation") != NULL &&
+        //    layer->properties.GetProperty("Navigation")->value) {
+        //    return layer;
+        //}
+        if (layer->name == "Navigation") {
             return layer;
+        }
+    }
+
+    return nullptr;
+}
+
+Properties::Property* Properties::GetProperty(const char* name)
+{
+    for (const auto& property : propertyList) {
+        if (property->name == name) {
+            return property;
         }
     }
 
