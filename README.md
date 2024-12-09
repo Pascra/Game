@@ -23,20 +23,26 @@ A Key (left)
 
 Special controls:
 F1 (colliders)
-F10 (God mode)
-F11 (cap fps limit to 30)
+F5 (Save player position)
+F6 (Load player position)
+F10 (God mode - doesn't work yet)
+F11 (cap fps limit to 30 - doesn't work well yet)
+k, j, n, m, b --> Show pathfindings
 
 ~~~~~~~~~~~~~~~
 
 ## Features implemented
 
-_0.5 version features:_
+_0.8 version features:_
 
-* Make github page
-* Map and player assets
-* Physics
+* Github page
+* New assets (enemies, map, audio, etc)
+* Enemies and pathfinding implemented
+* Audio implemented
 * Implementation of some debug keys
-* Collisions
+* More collisions
+* Save and load the position of the player
+* Lose/death condition --> fall
 
 # FrameStudios - Our team
 
