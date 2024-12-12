@@ -9,6 +9,7 @@
 #include "Physics.h"
 #include "Map.h"
 #include "EntityManager.h"
+#include "tracy/Tracy.hpp"
 
 Enemy::Enemy() : Entity(EntityType::ENEMY)
 {
@@ -56,6 +57,7 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt)
 {
+	ZoneScoped;
 	// Pathfinding testing inputs
 	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_R) == KEY_DOWN) {
 		Vector2D pos = GetPosition();

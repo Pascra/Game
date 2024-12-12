@@ -10,6 +10,7 @@
 #include "Map.h"
 #include "Item.h"
 #include "Physics.h"
+#include "tracy/Tracy.hpp"
 
 Scene::Scene() : Module()
 {
@@ -51,11 +52,13 @@ bool Scene::Start()
 
 bool Scene::PreUpdate()
 {
+    ZoneScoped;
     return true;
 }
 
 bool Scene::Update(float dt)
 {
+    ZoneScoped;
     LOG("Before Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
     Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
@@ -91,6 +94,7 @@ bool Scene::Update(float dt)
 
 bool Scene::PostUpdate()
 {
+    ZoneScoped;
     bool ret = true;
 
     if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F5) == KEY_DOWN)

@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Log.h"
 #include "Physics.h"
+#include "tracy/Tracy.hpp"
 
 Player::Player() : Entity(EntityType::PLAYER)
 {
@@ -53,6 +54,7 @@ bool Player::Start()
 
 bool Player::Update(float dt)
 {
+	ZoneScoped;
 	if (pendingToReset) {
 		ResetToInitialPosition();
 		pendingToReset = false;
