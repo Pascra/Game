@@ -48,4 +48,6 @@ private:
 	Animation idle;
 	PhysBody* pbody;
 	Pathfinding* pathfinding;
+
+
 };

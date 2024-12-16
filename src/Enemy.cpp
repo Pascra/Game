@@ -26,6 +26,8 @@ bool Enemy::Awake() {
 
 bool Enemy::Start() {
 
+
+
 	//initilize textures
 	texture = Engine::GetInstance().textures.get()->Load(parameters.attribute("texture").as_string());
 	position.setX(parameters.attribute("x").as_int());

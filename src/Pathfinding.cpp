@@ -16,6 +16,8 @@ Pathfinding::Pathfinding() {
 
     // Initialize the costSoFar with all elements set to 0
     costSoFar = std::vector<std::vector<int>>(map->GetWidth(), std::vector<int>(map->GetHeight(), 0));
+
+   
 }
 
 Pathfinding::~Pathfinding() {
