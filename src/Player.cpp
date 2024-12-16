@@ -100,7 +100,7 @@ bool Player::Update(float dt)
 	position.setY(METERS_TO_PIXELS(pbodyPos.p.y) - texH / 2);
 
 	// Check if player has fallen below a certain height
-	if (position.getY() > 1000) // Adjust this value as needed
+	if (position.getY() > 433) // Adjust this value as needed
 	{
 		ResetToInitialPosition();
 	}
