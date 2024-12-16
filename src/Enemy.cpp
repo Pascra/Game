@@ -158,11 +158,25 @@ void Enemy::OnCollision(PhysBody* physA, PhysBody* physB) {
 	switch (physB->ctype)
 	{
 	case ColliderType::PLAYER:
-		LOG("Collided with player - DESTROY");
-		Engine::GetInstance().entityManager.get()->DestroyEntity(this);
+		// Obtener posición del ENEMY
+		Vector2D enemyPos = GetPosition();
+
+		// Obtener posición del PLAYER
+		b2Vec2 playerBodyPos = physB->body->GetPosition();
+		Vector2D playerPos(METERS_TO_PIXELS(playerBodyPos.x), METERS_TO_PIXELS(playerBodyPos.y));
+
+		// Verificar si el PLAYER está por encima del ENEMY
+		if (playerPos.getY() < enemyPos.getY() - (texH / 4)) {
+			LOG("Player is above the enemy - DESTROY");
+			Engine::GetInstance().entityManager.get()->DestroyEntity(this);
+		}
+		else {
+			LOG("Player collided but not from above");
+		}
 		break;
 	}
 }
+
 
 void Enemy::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 {

@@ -140,9 +140,30 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 		LOG("Collision UNKNOWN");
 		break;
 	case ColliderType::ENEMY:
-		LOG("Collision UNKNOWN");
-		pendingToReset = true;
+	{
+		LOG("Collision with ENEMY");
+
+		// Obtener la posición del jugador
+		Vector2D playerPos = GetPosition();
+
+		// Obtener la posición del enemigo
+		b2Vec2 enemyBodyPos = physB->body->GetTransform().p;
+		Vector2D enemyPos = Vector2D(METERS_TO_PIXELS(enemyBodyPos.x), METERS_TO_PIXELS(enemyBodyPos.y));
+
+		// Calcular si el jugador está encima del enemigo
+		// Considerando la altura del enemigo (texH) y un margen para ajustar la colisión
+		if (playerPos.getY() < enemyPos.getY() - (texH / 4)) {
+			// El jugador está pisando al enemigo, no se resetea
+			LOG("Player is above the ENEMY - NO Reset");
+		}
+		else {
+			// El jugador colisiona desde un lado o por debajo, se resetea
+			pendingToReset = true;
+			LOG("Player collided with ENEMY from the side or below - Reset");
+		}
 		break;
+	}
+
 	default:
 		break;
 	}
