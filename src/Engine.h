@@ -43,8 +43,12 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	void Exit();
+	bool IsRunning() const;
+
 private:
 
+	bool running = true;
 	// Private constructor to prevent instantiation
 	// Constructor
 	Engine();

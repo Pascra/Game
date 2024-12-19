@@ -236,10 +236,15 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
     }
 
     // Detecta si uno de los nuevos botones fue presionado
-    if (control->id >= 2 && control->id <= 4)
+    if (control->id == 2) // Botón "RESPAWN"
     {
-        LOG("Additional Button Pressed: %d", control->id);
-        // Añade lógica específica para los nuevos botones aquí
+        LOG("Respawn Button Pressed");
+        player->ResetToInitialPosition(); // Llama al método para reiniciar la posición del jugador
+    }
+    else if (control->id == 4) // Botón "EXIT"
+    {
+        LOG("Exit Button Pressed");
+        Engine::GetInstance().Exit(); // Llama al método para cerrar el juego
     }
 
     return true;

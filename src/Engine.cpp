@@ -151,6 +151,17 @@ bool Engine::Update() {
     return ret;
 }
 
+void Engine::Exit()
+{
+    LOG("Exiting the game...");
+    running = false; // Cambia el estado de 'running' para salir del juego
+}
+
+bool Engine::IsRunning() const
+{
+    return running; // Devuelve el estado actual de 'running'
+}
+
 // Called before quitting
 bool Engine::CleanUp() {
 
