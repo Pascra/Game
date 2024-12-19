@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include <vector>
 #include <string>
+#include "GuiControlButton.h"
 
 struct SDL_Texture;
 
@@ -40,6 +41,9 @@ public:
 
     int birdsFxId = -1;
 
+    // Handles multiple Gui Event methods
+    bool OnGuiMouseClickEvent(GuiControl* control);
+
 private:
     // Handle saving the game state
     void LoadState();
@@ -52,4 +56,7 @@ private:
     std::vector<Enemy*> enemyList; // List of enemies
     std::string tilePosDebug = "[0,0]"; // Debug information for tile position
     bool once = false; // Debug helper flag
+
+    //Declare a GUI Control Button
+        GuiControlButton* guiBt;
 };

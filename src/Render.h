@@ -3,6 +3,7 @@
 #include "Module.h"
 #include "Vector2D.h"
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 
 // Render module for managing 2D drawing with SDL
 class Render : public Module
@@ -51,6 +52,9 @@ public:
     // Load a texture from a file
     SDL_Texture* LoadTexture(const char* path);
 
+    bool DrawText(const char* text, int posX, int posY, int w, int h) const;
+
+    
     
 
 public:
@@ -58,4 +62,5 @@ public:
     SDL_Rect camera;                 // Camera rectangle for rendering
     SDL_Rect viewport;               // Viewport for the renderer
     SDL_Color background = { 0, 0, 0, 255 }; // Background color
+    TTF_Font* font;
 };

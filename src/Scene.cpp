@@ -11,6 +11,9 @@
 #include "Item.h"
 #include "Physics.h"
 #include "tracy/Tracy.hpp"
+#include "GuiControl.h"
+#include "GuiManager.h"
+
 
 Scene::Scene() : Module()
 {
@@ -37,6 +40,10 @@ bool Scene::Awake()
         enemyList.push_back(enemy);
     }
 
+   // Instantiate a new GuiControlButton in the Scene
+        SDL_Rect btPos = { 520, 350, 120,20 };
+    guiBt = (GuiControlButton*)Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 1, "MyButton", btPos, this);
+
     return ret;
 }
 
@@ -59,12 +66,12 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
     ZoneScoped;
-    LOG("Before Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
+    //LOG("Before Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
     Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
     Engine::GetInstance().render.get()->camera.y = -(player->position.getY() - 400);
 
-    LOG("After Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
+    //LOG("After Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
     int scale = Engine::GetInstance().window.get()->GetScale();
     if (scale <= 0)
@@ -83,11 +90,11 @@ bool Scene::Update(float dt)
     SDL_Rect rect = { 0, 0, 32, 32 };
     Engine::GetInstance().render.get()->DrawTexture(mouseTileTex, highlightTile.getX(), highlightTile.getY(), &rect);
 
-    if (!enemyList.empty() && Engine::GetInstance().input.get()->GetMouseButtonDown(1) == KEY_DOWN)
-    {
-        enemyList[0]->SetPosition(Vector2D(highlightTile.getX(), highlightTile.getY()));
-        enemyList[0]->ResetPath();
-    }
+    //if (!enemyList.empty() && Engine::GetInstance().input.get()->GetMouseButtonDown(1) == KEY_DOWN)
+    //{
+    //    enemyList[0]->SetPosition(Vector2D(highlightTile.getX(), highlightTile.getY()));
+    //    enemyList[0]->ResetPath();
+    //}
 
     return true;
 }
@@ -188,3 +195,10 @@ int mapWidth = Engine::GetInstance().map.get()->GetWidth(); // Ancho del mapa en
 int mapHeight = Engine::GetInstance().map.get()->GetHeight(); // Alto del mapa en píxeles
 
 
+bool Scene::OnGuiMouseClickEvent(GuiControl* control)
+{
+    // L15: DONE 5: Implement the OnGuiMouseClickEvent method
+    LOG("Press Gui Control: %d", control->id);
+
+    return true;
+}

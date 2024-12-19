@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "PerfTimer.h"
 #include "pugixml.hpp"
-
+#include "GuiManager.h"
 // Modules
 class Window;
 class Input;
@@ -18,6 +18,8 @@ class EntityManager;
 class Map;
 //L08 TODO 2: Add Physics module
 class Physics;
+
+class GuiManager;
 
 class Engine
 {
@@ -96,6 +98,7 @@ public:
 	std::shared_ptr<Map> map;
 	// L08: TODO 2: Add Physics module
 	std::shared_ptr<Physics> physics;
+	std::shared_ptr<GuiManager> guiManager;
 
 
 private: 
