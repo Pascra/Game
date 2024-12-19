@@ -4,6 +4,7 @@
 
 #include "GuiControlButton.h"
 #include "Audio.h"
+#include <algorithm>
 
 GuiManager::GuiManager() :Module()
 {
@@ -58,6 +59,15 @@ bool GuiManager::CleanUp()
 
 	return true;
 }
-
+void GuiManager::DestroyGuiControl(GuiControl* control)
+{
+	// Verifica que el control existe en la lista
+	auto it = std::find(guiControlsList.begin(), guiControlsList.end(), control);
+	if (it != guiControlsList.end())
+	{
+		delete* it;                  // Libera la memoria del control
+		guiControlsList.erase(it);   // Elimina el control de la lista
+	}
+}
 
 

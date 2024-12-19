@@ -59,4 +59,10 @@ private:
 
     //Declare a GUI Control Button
         GuiControlButton* guiBt;
+
+        // Almacena los botones adicionales
+        std::vector<GuiControl*> additionalButtons;
+
+      
+        bool buttonsVisible = false;               // Indica si los botones están visibles
 };

@@ -82,9 +82,34 @@ bool Render::Awake()
 bool Render::Start()
 {
     LOG("Render start");
-    if (renderer != nullptr) {
+
+    // Verifica que el renderer esté inicializado
+    if (renderer != nullptr)
+    {
         SDL_RenderGetViewport(renderer, &viewport);
     }
+    else
+    {
+        LOG("Renderer is null! Initialization failed.");
+        return false;
+    }
+
+    // Inicializa SDL_ttf para soporte de fuentes
+    if (TTF_Init() == -1)
+    {
+        LOG("SDL_ttf could not initialize! SDL_ttf Error: %s", TTF_GetError());
+        return false;
+    }
+
+    // Carga la fuente por defecto
+    font = TTF_OpenFont("Assets/Fonts/arial/arial.ttf", 24); // Cambia la ruta si es necesario
+    if (font == nullptr)
+    {
+        LOG("Failed to load font: %s", TTF_GetError());
+        return false;
+    }
+
+    LOG("Render and font initialized successfully.");
     return true;
 }
 
@@ -341,4 +366,46 @@ bool Render::DrawText(const char* text, int posx, int posy, int w, int h) const
     SDL_FreeSurface(surface);
 
     return true;
+}
+void Render::CalculateTextSize(const char* text, int& width, int& height)
+{
+    if (font != nullptr)
+    {
+        TTF_SizeText(font, text, &width, &height);
+    }
+}
+void Render::DrawText(const char* text, int x, int y, SDL_Color color)
+{
+    if (font == nullptr)
+    {
+        LOG("Font not loaded. Unable to draw text.");
+        return;
+    }
+
+    // Renderiza el texto en una superficie
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
+    if (surface == nullptr)
+    {
+        LOG("Failed to create text surface: %s", TTF_GetError());
+        return;
+    }
+
+    // Convierte la superficie en una textura
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (texture == nullptr)
+    {
+        LOG("Failed to create text texture: %s", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return;
+    }
+
+    // Define el rectángulo destino para el texto
+    SDL_Rect destRect = { x, y, surface->w, surface->h };
+
+    // Dibuja la textura en el renderer
+    SDL_RenderCopy(renderer, texture, nullptr, &destRect);
+
+    // Limpia la superficie y textura temporal
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }

@@ -32,7 +32,8 @@ bool Scene::Awake()
 
     Item* item = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     item->position = Vector2D(200, 672);
-    // crear enemigo
+
+    // Crear enemigo
     for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy"); enemyNode; enemyNode = enemyNode.next_sibling("enemy"))
     {
         Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
@@ -40,9 +41,9 @@ bool Scene::Awake()
         enemyList.push_back(enemy);
     }
 
-   // Instantiate a new GuiControlButton in the Scene
-        SDL_Rect btPos = { 520, 350, 120,20 };
-    guiBt = (GuiControlButton*)Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 1, "MyButton", btPos, this);
+    // Crear el botón original con el texto "MENU"
+    SDL_Rect btPos = { 1170, 120, 80, 30 }; // Tamaño ajustado para acomodar el texto
+    guiBt = (GuiControlButton*)Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 1, "MENU", btPos, this);
 
     return ret;
 }
@@ -197,8 +198,49 @@ int mapHeight = Engine::GetInstance().map.get()->GetHeight(); // Alto del mapa e
 
 bool Scene::OnGuiMouseClickEvent(GuiControl* control)
 {
-    // L15: DONE 5: Implement the OnGuiMouseClickEvent method
     LOG("Press Gui Control: %d", control->id);
+
+    // Detecta si el botón original fue presionado
+    if (control->id == 1) // ID del botón original
+    {
+        if (buttonsVisible)
+        {
+            // Ocultar los botones: eliminarlos del vector
+            for (GuiControl* button : additionalButtons)
+            {
+                Engine::GetInstance().guiManager->DestroyGuiControl(button);
+            }
+            additionalButtons.clear();
+            LOG("Additional buttons hidden");
+        }
+        else
+        {
+            // Mostrar los botones adicionales con sus textos
+            SDL_Rect button1Rect = { 1100, 200, 100, 40 }; // Ajusta tamaño según texto
+            SDL_Rect button2Rect = { 1100, 250, 100, 40 };
+            SDL_Rect button3Rect = { 1100, 300, 100, 40 };
+
+            GuiControl* button1 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 2, "RESPAWN", button1Rect, this);
+            GuiControl* button2 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 3, "LEVELS", button2Rect, this);
+            GuiControl* button3 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 4, "EXIT", button3Rect, this);
+
+            additionalButtons.push_back(button1);
+            additionalButtons.push_back(button2);
+            additionalButtons.push_back(button3);
+
+            LOG("Additional buttons shown");
+        }
+
+        // Cambia el estado de visibilidad
+        buttonsVisible = !buttonsVisible;
+    }
+
+    // Detecta si uno de los nuevos botones fue presionado
+    if (control->id >= 2 && control->id <= 4)
+    {
+        LOG("Additional Button Pressed: %d", control->id);
+        // Añade lógica específica para los nuevos botones aquí
+    }
 
     return true;
 }

@@ -54,7 +54,8 @@ public:
 
     bool DrawText(const char* text, int posX, int posY, int w, int h) const;
 
-    
+    void DrawText(const char* text, int x, int y, SDL_Color color = { 255, 255, 255, 255 });
+    void CalculateTextSize(const char* text, int& width, int& height);
     
 
 public:
