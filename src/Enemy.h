@@ -7,34 +7,33 @@
 
 struct SDL_Texture;
 
-class Enemy : public Entity
-{
+class Enemy : public Entity {
 public:
     Enemy();
     virtual ~Enemy();
 
-    bool Awake();
-    bool Start();
-    bool Update(float dt);
-    bool CleanUp();
-    void DrawPath();
+    virtual bool Awake();
+    virtual bool Start();
+    virtual bool Update(float dt);
+    virtual bool CleanUp();
+    virtual void DrawPath();
 
-    void SetParameters(pugi::xml_node parameters);
+    virtual void SetParameters(pugi::xml_node parameters);
     void SetPosition(Vector2D pos);
     Vector2D GetPosition();
     void ResetPath();
-    void OnCollision(PhysBody* physA, PhysBody* physB);
-    void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
+    virtual void OnCollision(PhysBody* physA, PhysBody* physB);
+    virtual void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
 
-private:
-    SDL_Texture* texture;
+protected:
+    SDL_Texture* texture;               // Cambiado a protected para acceso en FlyingEnemy
     const char* texturePath;
-    int texW, texH;
+    int texW, texH;                     // Cambiado a protected
     pugi::xml_node parameters;
-    Animation* currentAnimation = nullptr;
+    Animation* currentAnimation = nullptr; // Cambiado a protected
     Animation idle;
-    PhysBody* pbody;
-    Pathfinding* pathfinding;
+    PhysBody* pbody;                    // Cambiado a protected
+    Pathfinding* pathfinding;           // Cambiado a protected
 
-    bool DrawPathFlag = false; // Flag to control the path drawing
+    bool DrawPathFlag = false;          // Flag to controlar el dibujo del path
 };

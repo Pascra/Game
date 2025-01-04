@@ -187,7 +187,11 @@ void Enemy::OnCollision(PhysBody* physA, PhysBody* physB) {
         }
     }
 }
-
+void Enemy::DrawPath() {
+    if (pathfinding != nullptr) {
+        pathfinding->DrawPath();
+    }
+}
 void Enemy::OnCollisionEnd(PhysBody* physA, PhysBody* physB) {
     if (physB->ctype == ColliderType::PLAYER) {
         LOG("Collision ended with player");

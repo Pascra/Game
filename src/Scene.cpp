@@ -13,6 +13,7 @@
 #include "tracy/Tracy.hpp"
 #include "GuiControl.h"
 #include "GuiManager.h"
+#include "flyingEnemy.h"
 
 
 Scene::Scene() : Module()
@@ -23,8 +24,7 @@ Scene::Scene() : Module()
 
 Scene::~Scene() {}
 
-bool Scene::Awake()
-{
+bool Scene::Awake() {
     LOG("Loading Scene");
     bool ret = true;
 
@@ -33,12 +33,23 @@ bool Scene::Awake()
     Item* item = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     item->position = Vector2D(200, 672);
 
-    // Crear enemigo
-    for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy"); enemyNode; enemyNode = enemyNode.next_sibling("enemy"))
-    {
-        Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
-        enemy->SetParameters(enemyNode);
-        enemyList.push_back(enemy);
+    // Crear enemigos (terrestres y voladores)
+    for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy");
+        enemyNode;
+        enemyNode = enemyNode.next_sibling("enemy")) {
+        std::string name = enemyNode.attribute("name").as_string();
+        if (name == "flyingguy") {
+            // Crear un enemigo volador
+            FlyingEnemy* flyingEnemy = (FlyingEnemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
+            flyingEnemy->SetParameters(enemyNode);
+            enemyList.push_back(flyingEnemy);
+        }
+        else {
+            // Crear un enemigo terrestre
+            Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
+            enemy->SetParameters(enemyNode);
+            enemyList.push_back(enemy);
+        }
     }
 
     // Crear el botón original con el texto "MENU"
@@ -47,6 +58,7 @@ bool Scene::Awake()
 
     return ret;
 }
+
 
 bool Scene::Start()
 {
