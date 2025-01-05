@@ -209,3 +209,9 @@ void Player::ResetToInitialPosition()
 	isJumping = false;
 	pbody->body->SetLinearVelocity(b2Vec2(0, 0)); // Reset velocity
 }
+void Player::SetParameters(pugi::xml_node parameters) {
+	this->parameters = parameters;
+	position.setX(parameters.attribute("x").as_int());
+	position.setY(parameters.attribute("y").as_int());
+	name = parameters.attribute("name").as_string();
+}

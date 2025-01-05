@@ -32,7 +32,8 @@ public:
     void ResetToInitialPosition();
 
     // Configurar parámetros del jugador desde un nodo XML
-    void SetParameters(pugi::xml_node parameters);
+   
+    void SetParameters(pugi::xml_node parameters) override;
 
 public:
     // Declaración de parámetros del jugador

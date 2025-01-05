@@ -13,6 +13,17 @@ FlyingEnemy::FlyingEnemy() : Enemy() {
 
 FlyingEnemy::~FlyingEnemy() {}
 
+
+bool FlyingEnemy::Start() {
+    // Llama al método base para inicializar los datos comunes
+    Enemy::Start();
+
+    // Asegúrate de que la gravedad esté desactivada
+    pbody->body->SetGravityScale(0); // Desactiva la gravedad para enemigos voladores
+
+    return true;
+}
+
 bool FlyingEnemy::Update(float dt) {
     // Pathfinding logic (same as `Enemy`)
     ResetPath();
@@ -30,8 +41,9 @@ bool FlyingEnemy::Update(float dt) {
 
     // Draw texture and animation
     b2Transform pbodyPos = pbody->body->GetTransform();
-    position.setX(METERS_TO_PIXELS(pbodyPos.p.x) - texH / 2);
+    position.setX(METERS_TO_PIXELS(pbodyPos.p.x) - texW / 2);
     position.setY(METERS_TO_PIXELS(pbodyPos.p.y) - texH / 2);
+
     Engine::GetInstance().render.get()->DrawTexture(texture, (int)position.getX(), (int)position.getY(), &currentAnimation->GetCurrentFrame());
     currentAnimation->Update();
 
@@ -42,15 +54,19 @@ void FlyingEnemy::MoveToTarget(Vector2D targetTile) {
     Vector2D currentTile = Engine::GetInstance().map->WorldToMap(position.getX(), position.getY());
     b2Vec2 velocity(0, 0);
 
-    // Ajustar velocidad en el eje X
-    if (targetTile.getX() < currentTile.getX()) velocity.x = -2.0f; // Mover a la izquierda
-    if (targetTile.getX() > currentTile.getX()) velocity.x = 2.0f;  // Mover a la derecha
+    // Calcular diferencia entre el objetivo y la posición actual
+    float deltaX = targetTile.getX() - currentTile.getX();
+    float deltaY = targetTile.getY() - currentTile.getY();
 
-    // Ajustar velocidad en el eje Y
-    if (targetTile.getY() < currentTile.getY()) velocity.y = -2.0f; // Mover hacia arriba
-    if (targetTile.getY() > currentTile.getY()) velocity.y = 2.0f;  // Mover hacia abajo
+    // Calcular magnitud para normalizar
+    float magnitude = sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (magnitude > 0) {
+        velocity.x = (deltaX / magnitude) * 2.0f; // Velocidad normalizada en X
+        velocity.y = (deltaY / magnitude) * 2.0f; // Velocidad normalizada en Y
+    }
 
     // Aplicar la velocidad al cuerpo físico
     pbody->body->SetLinearVelocity(velocity);
 }
+
 

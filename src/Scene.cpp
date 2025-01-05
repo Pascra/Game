@@ -28,8 +28,10 @@ bool Scene::Awake() {
     LOG("Loading Scene");
     bool ret = true;
 
+    // Crear jugador
     player = (Player*)Engine::GetInstance().entityManager->CreateEntity(EntityType::PLAYER);
 
+    // Crear ítem
     Item* item = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     item->position = Vector2D(200, 672);
 
@@ -37,17 +39,17 @@ bool Scene::Awake() {
     for (pugi::xml_node enemyNode = configParameters.child("entities").child("enemies").child("enemy");
         enemyNode;
         enemyNode = enemyNode.next_sibling("enemy")) {
+        // Obtener el nombre del enemigo desde el nodo XML
         std::string name = enemyNode.attribute("name").as_string();
+
         if (name == "flyingguy") {
-            // Crear un enemigo volador
-            FlyingEnemy* flyingEnemy = (FlyingEnemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
-            flyingEnemy->SetParameters(enemyNode);
+            // Crear enemigo volador
+            FlyingEnemy* flyingEnemy = (FlyingEnemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY, enemyNode);
             enemyList.push_back(flyingEnemy);
         }
         else {
-            // Crear un enemigo terrestre
-            Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
-            enemy->SetParameters(enemyNode);
+            // Crear enemigo terrestre
+            Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY, enemyNode);
             enemyList.push_back(enemy);
         }
     }
@@ -58,6 +60,7 @@ bool Scene::Awake() {
 
     return ret;
 }
+
 
 
 bool Scene::Start()
