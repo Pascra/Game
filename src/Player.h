@@ -65,8 +65,14 @@ public:
 
     bool pendingToReset = false;
     void DrawLives();
+
+    int GetLives() const; // Obtener vidas actuales
+    void AddLife();       // Incrementar vidas
+    void RemoveLife();           // Decrementa las vidas
+    void ResetLives();
+    void RenderLives();
 private:
-    int lives; // Número de vidas del jugador
+    int lives = 3; // Número de vidas del jugador
     SDL_Texture* heartTexture; // Textura para el corazón
 
 };

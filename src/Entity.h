@@ -18,7 +18,7 @@ class Entity
 public:
 
 	Entity(EntityType type) : type(type), active(true) {}
-
+	EntityType GetType() const { return type; }
 	virtual bool Awake()
 	{
 		return true;

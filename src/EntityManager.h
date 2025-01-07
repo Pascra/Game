@@ -2,42 +2,27 @@
 
 #include "Module.h"
 #include "Entity.h"
-#include <list>
+#include "Player.h"
+#include <vector>
 
-class EntityManager : public Module
-{
+class EntityManager : public Module {
 public:
+    EntityManager();
+    virtual ~EntityManager();
 
-	EntityManager();
+    bool Awake() override;
+    bool Start() override;
+    bool Update(float dt) override;
+    bool CleanUp() override;
 
-	// Destructor
-	virtual ~EntityManager();
+    // Methods to manage entities
+    Entity* CreateEntity(EntityType type);
+    void DestroyEntity(Entity* entity);
+    void AddEntity(Entity* entity);
 
-	// Called before render is available
-	bool Awake();
+    // Retrieve the player instance
+    Player* GetPlayer();
 
-	// Called after Awake
-	bool Start();
-
-	// Called every frame
-	bool Update(float dt);
-
-	// Called before quitting
-	bool CleanUp();
-
-	// Additional methods
-	Entity* CreateEntity(EntityType type);
-
-	void DestroyEntity(Entity* entity);
-
-	void AddEntity(Entity* entity);
-
-
-
-public:
-	
-	
-
-	std::list<Entity*> entities;
-
+private:
+    std::vector<Entity*> entities; // Container to hold all entities
 };

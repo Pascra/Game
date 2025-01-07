@@ -3,33 +3,32 @@
 #include "Entity.h"
 #include "SDL2/SDL.h"
 
-struct SDL_Texture;
+enum class ItemType {
+    COIN,
+    HEART
+};
 
-class Item : public Entity
-{
+class Item : public Entity {
 public:
+    Item();
+    virtual ~Item();
 
-	Item();
-	virtual ~Item();
-
-	bool Awake();
-
-	bool Start();
-
-	bool Update(float dt);
-
-	bool CleanUp();
-
-public:
-
-	bool isPicked = false;
+    bool Awake();
+    bool Start();
+    bool Update(float dt);
+    bool CleanUp();
+    void OnCollision(PhysBody* physA, PhysBody* physB) override;
+    void SetItemType(ItemType type);
+    void SetPosition(const Vector2D& position);
 
 private:
+    ItemType itemType;
+    SDL_Texture* texture;
+    const char* texturePath;
+    int texW, texH;
 
-	SDL_Texture* texture;
-	const char* texturePath;
-	int texW, texH;
+    PhysBody* pbody;
 
-	//L08 TODO 4: Add a physics to an item
-	PhysBody* pbody;
+public:
+    bool isPicked = false; // Atributo para marcar si el ítem ha sido recogido
 };

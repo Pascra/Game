@@ -40,6 +40,13 @@
 						</idle>
 					</animations>
 				</item>
+				<item name="heart" x="1293" y="272" w="32" h="32" texture="Assets/Textures/Heart2.png" gravity="true">
+					<animations>
+						<idle loop="true" speed="0.5">
+							<frame x="0" y="0" w="32" h="32" />
+						</idle>
+					</animations>
+				</item>
 			</items>
 			<enemies>
 				<enemy name="badguy" x="670" y="350" w="32" h="32" texture="Assets/Textures/enemy/Idle.png" gravity="true">
@@ -78,7 +85,7 @@
 </config>
 <game>
 	<player>
-		<x>137</x>
-		<y>368</y>
+		<x>1178</x>
+		<y>272</y>
 	</player>
 </game>

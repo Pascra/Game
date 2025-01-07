@@ -1,123 +1,120 @@
 #include "EntityManager.h"
 #include "Player.h"
-#include "Engine.h"
-#include "Textures.h"
-#include "Scene.h"
-#include "Log.h"
 #include "Item.h"
+#include "Engine.h"
+#include "Log.h"
 #include "tracy/Tracy.hpp"
+#include "Enemy.h"
 
-EntityManager::EntityManager() : Module()
-{
-	name = "entitymanager";
+
+EntityManager::EntityManager() : Module() {
+    name = "entitymanager";
 }
 
-// Destructor
-EntityManager::~EntityManager()
-{}
+EntityManager::~EntityManager() {
+    CleanUp(); // Ensure proper cleanup
+}
 
-// Called before render is available
-bool EntityManager::Awake()
-{
-	LOG("Loading Entity Manager");
-	bool ret = true;
+bool EntityManager::Awake() {
+    LOG("Loading Entity Manager");
+    bool ret = true;
 
-	//Iterates over the entities and calls the Awake
-	for(const auto entity : entities)
-	{
-		if (entity->active == false) continue;
-		ret = entity->Awake();
-	}
+    for (auto entity : entities) {
+        if (entity && entity->active) {
+            ret = entity->Awake();
+        }
+    }
 
-	return ret;
-
+    return ret;
 }
 
 bool EntityManager::Start() {
+    bool ret = true;
 
-	bool ret = true; 
+    for (auto entity : entities) {
+        if (entity && entity->active) {
+            ret = entity->Start();
+        }
+    }
 
-	//Iterates over the entities and calls Start
-	for(const auto entity : entities)
-	{
-		if (entity->active == false) continue;
-		ret = entity->Start();
-	}
-
-	return ret;
+    return ret;
 }
 
-// Called before quitting
-bool EntityManager::CleanUp()
-{
-	bool ret = true;
+bool EntityManager::Update(float dt) {
+    ZoneScoped;
+    bool ret = true;
 
-	for(const auto entity : entities)
-	{
-		if (entity->active == false) continue;
-		ret = entity->CleanUp();
-	}
+    for (auto entity : entities) {
+        if (entity && entity->active) {
+            ret = entity->Update(dt);
+        }
+    }
 
-	entities.clear();
-
-	return ret;
+    return ret;
 }
 
-Entity* EntityManager::CreateEntity(EntityType type)
-{
-	Entity* entity = nullptr; 
+bool EntityManager::CleanUp() {
+    LOG("Cleaning up Entity Manager");
 
-	//L04: TODO 3a: Instantiate entity according to the type and add the new entity to the list of Entities
-	switch (type)
-	{
-	case EntityType::PLAYER:
-		entity = new Player();
-		break;
-	case EntityType::ITEM:
-		entity = new Item();
-		break;
-	case EntityType::ENEMY:
-		entity = new Enemy();
-		break;
-	default:
-		break;
-	}
+    for (auto entity : entities) {
+        if (entity) {
+            entity->CleanUp();
+            delete entity; // Free memory
+        }
+    }
 
-	entities.push_back(entity);
-
-	return entity;
+    entities.clear(); // Clear the container
+    return true;
 }
 
-void EntityManager::DestroyEntity(Entity* entity)
-{
-	for (auto it = entities.begin(); it != entities.end(); ++it)
-	{
-		if (*it == entity) {
-			
-			(*it)->CleanUp();
-			delete* it; // Free the allocated memory
-			entities.erase(it); // Remove the entity from the list
-			break; // Exit the loop after removing the entity 
-			
-			
-			
-		}
-	}
+Entity* EntityManager::CreateEntity(EntityType type) {
+    Entity* entity = nullptr;
+
+    switch (type) {
+    case EntityType::PLAYER:
+        entity = new Player();
+        break;
+    case EntityType::ITEM:
+        entity = new Item();
+        break;
+    case EntityType::ENEMY:
+        entity = new Enemy();
+        break;
+    default:
+        LOG("Unknown EntityType in CreateEntity");
+        return nullptr;
+    }
+
+    if (entity) {
+        entities.push_back(entity);
+    }
+
+    return entity;
 }
 
-void EntityManager::AddEntity(Entity* entity)
-{
-	if ( entity != nullptr) entities.push_back(entity);
+void EntityManager::DestroyEntity(Entity* entity) {
+    for (auto it = entities.begin(); it != entities.end(); ++it) {
+        if (*it == entity) {
+            (*it)->CleanUp(); // Limpia los recursos de la entidad
+            delete* it;       // Libera la memoria
+            entities.erase(it); // Elimina la entidad de la lista
+            break;
+        }
+    }
 }
 
-bool EntityManager::Update(float dt)
-{
-	ZoneScoped;
-	bool ret = true;
-	for(const auto entity : entities)
-	{
-		if (entity->active == false) continue;
-		ret = entity->Update(dt);
-	}
-	return ret;
+
+void EntityManager::AddEntity(Entity* entity) {
+    if (entity) {
+        entities.push_back(entity);
+    }
+}
+
+Player* EntityManager::GetPlayer() {
+    for (auto entity : entities) {
+        if (entity && entity->type == EntityType::PLAYER) {
+            return static_cast<Player*>(entity);
+        }
+    }
+    return nullptr; // Return nullptr if no player is found
 }

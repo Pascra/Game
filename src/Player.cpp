@@ -9,10 +9,10 @@
 #include "Physics.h"
 #include "tracy/Tracy.hpp"
 
-Player::Player() : Entity(EntityType::PLAYER)
-{
+Player::Player() : Entity(EntityType::PLAYER), lives(3) {
 	name = "Player";
 }
+
 
 Player::~Player() {}
 
@@ -129,7 +129,56 @@ void Player::DrawLives()
 	}
 }
 
+void Player::RenderLives() {
+	static SDL_Texture* heartTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Heart2.png");
 
+	int heartSize = 32; // Tamaño del corazón
+	int xOffset = 10;   // Espaciado entre corazones
+	int yOffset = 10;   // Margen superior
+
+	// Dibuja los corazones en la esquina superior izquierda de la pantalla
+	for (int i = 0; i < lives; i++) {
+		int xPos = xOffset + (heartSize + xOffset) * i;
+		Engine::GetInstance().render.get()->DrawTexture(heartTexture, xPos, yOffset);
+	}
+}
+
+
+
+
+
+int Player::GetLives() const {
+	return lives;
+}
+
+
+void Player::ResetLives() {
+	lives = 3;
+}
+
+void Player::AddLife() {
+	if (lives < 3) {
+		lives++;
+		LOG("Life added. Current lives: %d", lives);
+	}
+	else {
+		LOG("Lives are already at maximum.");
+	}
+}
+
+
+
+
+void Player::RemoveLife() {
+	if (lives > 0) {
+		lives--;
+		LOG("Life lost. Current lives: %d", lives);
+	}
+	if (lives == 0) {
+		LOG("No more lives. Resetting to 3.");
+		lives = 3; // Reinicia las vidas a 3 cuando se pierden todas
+	}
+}
 
 
 bool Player::CleanUp()
