@@ -15,7 +15,6 @@
 #include "GuiManager.h"
 #include "flyingEnemy.h"
 
-
 Scene::Scene() : Module()
 {
     name = "scene";
@@ -65,6 +64,7 @@ bool Scene::Awake() {
 
 bool Scene::Start()
 {
+    losingScreenTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Lose.png");
     Engine::GetInstance().audio.get()->PlayMusic("Assets/Audio/Music/Pixel10.ogg");
     Engine::GetInstance().map->Load("Assets/Maps/", "mapa.tmx");
     birdsFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Birds.ogg");
@@ -95,7 +95,22 @@ bool Scene::Update(float dt)
         LOG("Invalid scale detected, setting scale to 1.");
         scale = 1;
     }
+    if (showLosingScreen)
+    {
+        // Renderiza la pantalla de derrota
+        int windowWidth, windowHeight;
+        Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
+        SDL_Rect destRect = { 0, 0, windowWidth, windowHeight };
+        Engine::GetInstance().render.get()->DrawTexture(losingScreenTexture, 0, 0, &destRect, 1.0f, 0.0, 0, 0, true);
 
+        // Reinicia el juego si se presiona una tecla
+        if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
+        {
+             //Reiniciar juego
+        }
+
+        return true; // Evita que otros elementos de la escena se actualicen
+    }
     Vector2D mousePos = Engine::GetInstance().input.get()->GetMousePosition();
     Vector2D mouseTile = Engine::GetInstance().map.get()->WorldToMap(
         mousePos.getX() - Engine::GetInstance().render.get()->camera.x / scale,
@@ -142,6 +157,15 @@ bool Scene::CleanUp()
     LOG("Freeing scene");
     SDL_DestroyTexture(img);
     return true;
+    if (losingScreenTexture != nullptr)
+    {
+        Engine::GetInstance().textures.get()->UnLoad(losingScreenTexture);
+        losingScreenTexture = nullptr;
+    }
+}
+void Scene::ShowLosingScreen()
+{
+    showLosingScreen = true; // Activa la bandera para mostrar la pantalla de derrota
 }
 
 void Scene::LoadState()
@@ -263,4 +287,11 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
     }
 
     return true;
+}
+void Scene::RestartGame()
+{
+    LOG("Restarting game...");
+    showLosingScreen = false; // Oculta la pantalla de derrota
+    player->ResetLives();     // Reinicia las vidas del jugador
+    player->SetPosition(Vector2D(50, 50)); // Reinicia la posición inicial del jugador
 }

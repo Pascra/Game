@@ -39,7 +39,7 @@ public:
     float speed = 5.0f;
     SDL_Texture* texture = nullptr;
     int texW = 0, texH = 0;
-
+    SDL_Texture* LosingScreen = nullptr;
     // Cuerpo físico del jugador
     PhysBody* pbody = nullptr;
 

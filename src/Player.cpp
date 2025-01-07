@@ -196,7 +196,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		//LOG("Collision PLATFORM");
+		LOG("Collision PLATFORM");
 		// Reset the jump flag when touching the ground
 		isJumping = false;
 		break;
@@ -241,7 +241,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		//LOG("End Collision PLATFORM");
+		LOG("End Collision PLATFORM");
 		Engine::GetInstance().audio.get()->PlayFx(fallFxId);
 		break;
 	case ColliderType::ITEM:
@@ -278,8 +278,13 @@ void Player::ResetToInitialPosition()
 
 	if (lives <= 0)
 	{
-		LOG("Player ran out of lives! Resetting lives to 3.");
-		lives = 3; // Reiniciar vidas
+		LOG("Player ran out of lives! Showing LosingScreen...");
+		Scene* scene = Engine::GetInstance().scene.get(); // Usar .get() para obtener el puntero crudo
+		if (scene != nullptr)
+		{
+			scene->ShowLosingScreen(); // Llama al método para mostrar la pantalla de derrota
+		}
+		return;
 	}
 
 	// Restablecer posición y velocidad

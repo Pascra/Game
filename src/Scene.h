@@ -44,6 +44,12 @@ public:
     // Handles multiple Gui Event methods
     bool OnGuiMouseClickEvent(GuiControl* control);
 
+    void ShowLosingScreen(); // Muestra la pantalla de derrota
+    void RestartGame();
+
+    
+    bool showLosingScreen = false;
+
 private:
     // Handle saving the game state
     void LoadState();
@@ -56,6 +62,8 @@ private:
     std::vector<Enemy*> enemyList; // List of enemies
     std::string tilePosDebug = "[0,0]"; // Debug information for tile position
     bool once = false; // Debug helper flag
+    SDL_Texture* losingScreenTexture = nullptr;
+   
 
     //Declare a GUI Control Button
         GuiControlButton* guiBt;
