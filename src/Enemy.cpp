@@ -29,9 +29,6 @@ bool Enemy::Start() {
     // Initialize flag for path drawing
     DrawPathFlag = false;
 
- 
-
-
     // Initialize textures
     texture = Engine::GetInstance().textures.get()->Load(parameters.attribute("texture").as_string());
     position.setX(parameters.attribute("x").as_int());

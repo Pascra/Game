@@ -6,7 +6,7 @@ class FlyingEnemy : public Enemy {
 public:
     FlyingEnemy();
     ~FlyingEnemy();
-    bool Start() override;
+
   
     bool Update(float dt) override;
 

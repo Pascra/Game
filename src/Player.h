@@ -32,8 +32,7 @@ public:
     void ResetToInitialPosition();
 
     // Configurar parámetros del jugador desde un nodo XML
-   
-    void SetParameters(pugi::xml_node parameters) override;
+    void SetParameters(pugi::xml_node parameters);
 
 public:
     // Declaración de parámetros del jugador
@@ -65,4 +64,9 @@ public:
     Vector2D initialPosition;
 
     bool pendingToReset = false;
+    void DrawLives();
+private:
+    int lives; // Número de vidas del jugador
+    SDL_Texture* heartTexture; // Textura para el corazón
+
 };

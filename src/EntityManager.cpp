@@ -6,7 +6,6 @@
 #include "Log.h"
 #include "Item.h"
 #include "tracy/Tracy.hpp"
-#include "flyingEnemy.h"
 
 EntityManager::EntityManager() : Module()
 {
@@ -64,52 +63,30 @@ bool EntityManager::CleanUp()
 	return ret;
 }
 
-Entity* EntityManager::CreateEntity(EntityType type, pugi::xml_node parameters)
+Entity* EntityManager::CreateEntity(EntityType type)
 {
-	Entity* entity = nullptr;
+	Entity* entity = nullptr; 
 
-	// Verifica el tipo de entidad
-	if (type == EntityType::ENEMY)
+	//L04: TODO 3a: Instantiate entity according to the type and add the new entity to the list of Entities
+	switch (type)
 	{
-		std::string name = parameters.attribute("name").as_string();
-		if (name == "flyingguy")
-		{
-			entity = new FlyingEnemy();
-		}
-		else
-		{
-			entity = new Enemy();
-		}
-	}
-	else if (type == EntityType::PLAYER)
-	{
+	case EntityType::PLAYER:
 		entity = new Player();
-	}
-	else if (type == EntityType::ITEM)
-	{
+		break;
+	case EntityType::ITEM:
 		entity = new Item();
+		break;
+	case EntityType::ENEMY:
+		entity = new Enemy();
+		break;
+	default:
+		break;
 	}
 
-	// Configurar los parámetros y posición inicial
-	if (entity != nullptr)
-	{
-		entity->SetParameters(parameters); // Asigna parámetros XML
-		entities.push_back(entity);        // Añade la entidad a la lista
-	}
+	entities.push_back(entity);
 
 	return entity;
 }
-
-Entity* EntityManager::CreateEntity(EntityType type)
-{
-	// Llama a la sobrecarga que utiliza un nodo XML vacío
-	pugi::xml_node emptyNode;
-	return CreateEntity(type, emptyNode);
-}
-
-
-
-
 
 void EntityManager::DestroyEntity(Entity* entity)
 {

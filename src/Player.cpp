@@ -25,6 +25,9 @@ bool Player::Awake()
 
 bool Player::Start()
 {
+	lives = 3;
+	heartTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Heart.png");
+
 	//L03: TODO 2: Initialize Player parameters
 	texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/player1.png");
 
@@ -114,14 +117,29 @@ bool Player::Update(float dt)
 	Engine::GetInstance().render.get()->DrawTexture(texture, (int)position.getX(), (int)position.getY());
 	return true;
 }
+void Player::DrawLives()
+{
+	int x = 10; // Posición inicial en X (arriba a la izquierda)
+	int y = 10; // Posición inicial en Y
+
+	for (int i = 0; i < lives; ++i)
+	{
+		Engine::GetInstance().render.get()->DrawTexture(heartTexture, x, y, nullptr, 1.0f, 0.0, 0, 0, true); // ignoreCamera = true
+		x += 40; // Espacio entre cada corazón
+	}
+}
+
+
 
 
 bool Player::CleanUp()
 {
 	LOG("Cleanup player");
 	Engine::GetInstance().textures.get()->UnLoad(texture);
+	Engine::GetInstance().textures.get()->UnLoad(heartTexture); // Descarga la textura del corazón
 	return true;
 }
+
 
 // L08 TODO 6: Define OnCollision function for the player. 
 void Player::OnCollision(PhysBody* physA, PhysBody* physB)
@@ -205,13 +223,19 @@ Vector2D Player::GetPosition()
 void Player::ResetToInitialPosition()
 {
 	LOG("Player died and respawned.");
+
+	// Reducir vidas
+	lives--;
+
+	if (lives <= 0)
+	{
+		LOG("Player ran out of lives! Resetting lives to 3.");
+		lives = 3; // Reiniciar vidas
+	}
+
+	// Restablecer posición y velocidad
 	SetPosition(initialPosition);
 	isJumping = false;
-	pbody->body->SetLinearVelocity(b2Vec2(0, 0)); // Reset velocity
+	pbody->body->SetLinearVelocity(b2Vec2(0, 0));
 }
-void Player::SetParameters(pugi::xml_node parameters) {
-	this->parameters = parameters;
-	position.setX(parameters.attribute("x").as_int());
-	position.setY(parameters.attribute("y").as_int());
-	name = parameters.attribute("name").as_string();
-}
+

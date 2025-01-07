@@ -3,40 +3,41 @@
 #include "Module.h"
 #include "Entity.h"
 #include <list>
-#include "pugixml.hpp"
 
 class EntityManager : public Module
 {
 public:
-    EntityManager();
 
-    // Destructor
-    virtual ~EntityManager();
+	EntityManager();
 
-    // Llamado antes de que el render esté disponible
-    bool Awake();
+	// Destructor
+	virtual ~EntityManager();
 
-    // Llamado después de Awake
-    bool Start();
+	// Called before render is available
+	bool Awake();
 
-    // Llamado cada frame
-    bool Update(float dt);
+	// Called after Awake
+	bool Start();
 
-    // Llamado antes de salir
-    bool CleanUp();
+	// Called every frame
+	bool Update(float dt);
 
-    // Crear entidad genérica
-    Entity* CreateEntity(EntityType type);
+	// Called before quitting
+	bool CleanUp();
 
-    // Crear entidad con parámetros XML
-    Entity* CreateEntity(EntityType type, pugi::xml_node parameters);
+	// Additional methods
+	Entity* CreateEntity(EntityType type);
 
-    // Destruir una entidad específica
-    void DestroyEntity(Entity* entity);
+	void DestroyEntity(Entity* entity);
 
-    // Añadir una entidad existente
-    void AddEntity(Entity* entity);
+	void AddEntity(Entity* entity);
+
+
 
 public:
-    std::list<Entity*> entities; // Lista de entidades
+	
+	
+
+	std::list<Entity*> entities;
+
 };

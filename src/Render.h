@@ -24,6 +24,7 @@ public:
     bool PreUpdate();
     bool Update(float dt);
     bool PostUpdate();
+    bool DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = nullptr, float speed = 1.0f, double angle = 0.0, int pivotX = INT_MAX, int pivotY = INT_MAX, bool ignoreCamera = false);
 
     // Called before quitting
     bool CleanUp();
