@@ -196,7 +196,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("Collision PLATFORM");
+		//LOG("Collision PLATFORM");
 		// Reset the jump flag when touching the ground
 		isJumping = false;
 		break;
@@ -241,7 +241,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("End Collision PLATFORM");
+		//LOG("End Collision PLATFORM");
 		Engine::GetInstance().audio.get()->PlayFx(fallFxId);
 		break;
 	case ColliderType::ITEM:

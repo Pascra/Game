@@ -115,7 +115,7 @@ bool Render::Start()
 bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivotX, int pivotY, bool ignoreCamera)
 {
     if (renderer == nullptr || texture == nullptr) {
-        LOG("Cannot draw texture. Renderer or texture is null.");
+       // LOG("Cannot draw texture. Renderer or texture is null.");
         return false;
     }
 

@@ -36,11 +36,19 @@ bool Item::Start() {
 
     // Configurar tamaño y cuerpo físico
     Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
-    pbody = Engine::GetInstance().physics.get()->CreateCircle((int)position.getX() + texH / 2, (int)position.getY() + texH / 2, texH / 2, bodyType::DYNAMIC);
+    pbody = Engine::GetInstance().physics.get()->CreateCircle(
+        (int)position.getX() + texH / 2,
+        (int)position.getY() + texH / 2,
+        texH / 2,
+        bodyType::DYNAMIC
+    );
+
     pbody->ctype = ColliderType::ITEM;
+    pbody->listener = this; // Asegúrate de que este listener está asignado
 
     return true;
 }
+
 
 bool Item::Update(float dt) {
     ZoneScoped;
@@ -57,9 +65,12 @@ bool Item::Update(float dt) {
 void Item::OnCollision(PhysBody* physA, PhysBody* physB) {
     if (!isPicked && physB->ctype == ColliderType::PLAYER) {
         Player* player = Engine::GetInstance().entityManager->GetPlayer();
+        LOG("esto va");
         if (player != nullptr) {
+            LOG("esti tambe");
             if (itemType == ItemType::HEART) {
                 player->AddLife(); // Añade una vida al jugador
+                LOG( "add life");
             }
             isPicked = true; // Marca el ítem como recogido
             Engine::GetInstance().entityManager->DestroyEntity(this); // Destruye la entidad
