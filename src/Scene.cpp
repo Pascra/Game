@@ -19,11 +19,24 @@ Scene::Scene() : Module()
 {
     name = "scene";
     img = nullptr;
+    player = nullptr;
+    losingScreenTexture = nullptr;
+    guiBt = nullptr;
+    counter = 0; // Inicializa el contador
+    counterTexture = nullptr;
+    font = nullptr;
+    textColor = { 255, 255, 255, 255 }; // Blanco por defecto
+    buttonsVisible = false;
+
+    // Inicializa enemyList como lista vacía
+    enemyList = std::list<Enemy*>();
 }
+
 
 Scene::~Scene() {}
 
-bool Scene::Awake() {
+bool Scene::Awake()
+{
     LOG("Loading Scene");
     bool ret = true;
 
@@ -41,13 +54,11 @@ bool Scene::Awake() {
         enemyNode = enemyNode.next_sibling("enemy")) {
         std::string name = enemyNode.attribute("name").as_string();
         if (name == "flyingguy") {
-            // Crear un enemigo volador
             FlyingEnemy* flyingEnemy = (FlyingEnemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
             flyingEnemy->SetParameters(enemyNode);
             enemyList.push_back(flyingEnemy);
         }
         else {
-            // Crear un enemigo terrestre
             Enemy* enemy = (Enemy*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY);
             enemy->SetParameters(enemyNode);
             enemyList.push_back(enemy);
@@ -64,14 +75,29 @@ bool Scene::Awake() {
 
 bool Scene::Start()
 {
+    if (TTF_Init() == -1) {
+        LOG("Failed to initialize SDL_ttf: %s", TTF_GetError());
+        return false;
+    }
+
     losingScreenTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Lose.png");
     Engine::GetInstance().audio.get()->PlayMusic("Assets/Audio/Music/Pixel10.ogg");
     Engine::GetInstance().map->Load("Assets/Maps/", "mapa.tmx");
     birdsFxId = Engine::GetInstance().audio.get()->LoadFx("Assets/Audio/Fx/Birds.ogg");
     Engine::GetInstance().audio.get()->PlayFx(birdsFxId);
-    
+
+    font = TTF_OpenFont("Assets/Fonts/arial/arial.ttf", 24); // Ruta y tamaño de la fuente
+    if (!font) {
+        LOG("Failed to load font: %s", TTF_GetError());
+        
+    }
+
+    counterTexture = nullptr;
+    counter = 0; // Inicializa el contador
+
     return true;
 }
+
 
 bool Scene::PreUpdate()
 {
@@ -82,50 +108,46 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
     ZoneScoped;
-    //LOG("Before Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
 
     Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
     Engine::GetInstance().render.get()->camera.y = -(player->position.getY() - 400);
 
-    //LOG("After Update - Player position: (%d, %d)", player->position.getX(), player->position.getY());
-
     int scale = Engine::GetInstance().window.get()->GetScale();
-    if (scale <= 0)
-    {
+    if (scale <= 0) {
         LOG("Invalid scale detected, setting scale to 1.");
         scale = 1;
     }
-    if (showLosingScreen)
-    {
+
+    if (showLosingScreen) {
         // Renderiza la pantalla de derrota
         int windowWidth, windowHeight;
         Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
         SDL_Rect destRect = { 0, 0, windowWidth, windowHeight };
         Engine::GetInstance().render.get()->DrawTexture(losingScreenTexture, 0, 0, &destRect, 1.0f, 0.0, 0, 0, true);
 
-        // Reinicia el juego si se presiona una tecla
-        if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
-        {
-             //Reiniciar juego
+        if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN) {
+            RestartGame();
         }
 
-        return true; // Evita que otros elementos de la escena se actualicen
+        return true;
     }
-    Vector2D mousePos = Engine::GetInstance().input.get()->GetMousePosition();
-    Vector2D mouseTile = Engine::GetInstance().map.get()->WorldToMap(
-        mousePos.getX() - Engine::GetInstance().render.get()->camera.x / scale,
-        mousePos.getY() - Engine::GetInstance().render.get()->camera.y / scale
-    );
 
-    Vector2D highlightTile = Engine::GetInstance().map.get()->MapToWorld(mouseTile.getX(), mouseTile.getY());
-    SDL_Rect rect = { 0, 0, 32, 32 };
-    Engine::GetInstance().render.get()->DrawTexture(mouseTileTex, highlightTile.getX(), highlightTile.getY(), &rect);
+    // Actualiza el contador
+    counter += dt * 10;
 
-    //if (!enemyList.empty() && Engine::GetInstance().input.get()->GetMouseButtonDown(1) == KEY_DOWN)
-    //{
-    //    enemyList[0]->SetPosition(Vector2D(highlightTile.getX(), highlightTile.getY()));
-    //    enemyList[0]->ResetPath();
-    //}
+    // Genera la textura del contador
+    std::string counterText = "Counter: " + std::to_string((int)counter);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, counterText.c_str(), textColor);
+    if (counterTexture) {
+        SDL_DestroyTexture(counterTexture); // Elimina la textura anterior
+    }
+    counterTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, surface);
+    SDL_FreeSurface(surface);
+
+    // Renderiza la textura del contador
+    SDL_Rect destRect = { 10, 10, 200, 50 }; // Posición y tamaño
+    Engine::GetInstance().render.get()->DrawTexture(counterTexture, destRect.x, destRect.y, &destRect, 1.0f, 0.0, 0, 0, true);
+
     player->DrawLives();
     return true;
 }
@@ -155,13 +177,12 @@ bool Scene::PostUpdate()
 bool Scene::CleanUp()
 {
     LOG("Freeing scene");
-    SDL_DestroyTexture(img);
+
+    if (img) SDL_DestroyTexture(img);
+    if (counterTexture) SDL_DestroyTexture(counterTexture); // Libera la textura del contador
+    if (losingScreenTexture) Engine::GetInstance().textures.get()->UnLoad(losingScreenTexture);
+    if (font) TTF_CloseFont(font); // Libera la fuente
     return true;
-    if (losingScreenTexture != nullptr)
-    {
-        Engine::GetInstance().textures.get()->UnLoad(losingScreenTexture);
-        losingScreenTexture = nullptr;
-    }
 }
 void Scene::ShowLosingScreen()
 {

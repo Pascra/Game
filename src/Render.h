@@ -61,6 +61,7 @@ public:
 
 public:
     SDL_Renderer* renderer = nullptr; // SDL renderer for 2D drawing
+
     SDL_Rect camera;                 // Camera rectangle for rendering
     SDL_Rect viewport;               // Viewport for the renderer
     SDL_Color background = { 0, 0, 0, 255 }; // Background color

@@ -4,73 +4,72 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <vector>
+#include <list>
 #include <string>
 #include "GuiControlButton.h"
+#include "SDL2/SDL_ttf.h"
+
+#ifndef SCENE_H
+#define SCENE_H
 
 struct SDL_Texture;
 
 class Scene : public Module
 {
 public:
-
+    // Constructor
     Scene();
 
     // Destructor
     virtual ~Scene();
 
-    // Called before render is available
-    bool Awake();
+    // Lifecycle methods
+    bool Awake(); // Called before render is available
+    bool Start(); // Called before the first frame
+    bool PreUpdate(); // Called before all Updates
+    bool Update(float dt); // Called each loop iteration
+    bool PostUpdate(); // Called after all Updates
+    bool CleanUp(); // Called before quitting
 
-    // Called before the first frame
-    bool Start();
-
-    // Called before all Updates
-    bool PreUpdate();
-
-    // Called each loop iteration
-    bool Update(float dt);
-
-    // Called before all Updates
-    bool PostUpdate();
-
-    // Called before quitting
-    bool CleanUp();
-
-    // Retrieve the player's current position
-    Vector2D GetPlayerPosition();
-
-    int birdsFxId = -1;
-
-    // Handles multiple Gui Event methods
-    bool OnGuiMouseClickEvent(GuiControl* control);
-
-    void ShowLosingScreen(); // Muestra la pantalla de derrota
-    void RestartGame();
-
-    
-    bool showLosingScreen = false;
+    // Utility methods
+    Vector2D GetPlayerPosition(); // Retrieve the player's current position
+    bool OnGuiMouseClickEvent(GuiControl* control); // Handles GUI events
+    void ShowLosingScreen(); // Display the losing screen
+    void RestartGame(); // Restart the game state
 
 private:
-    // Handle saving the game state
-    void LoadState();
-    void SaveState();
+    // Internal helper methods
+    void LoadState(); // Load the game state from a file
+    void SaveState(); // Save the game state to a file
 
 private:
+    // Textures and UI
     SDL_Texture* img = nullptr; // Placeholder texture
     SDL_Texture* mouseTileTex = nullptr; // Texture for tile highlighting
-    Player* player = nullptr; // Reference to the player entity
-    std::vector<Enemy*> enemyList; // List of enemies
-    std::string tilePosDebug = "[0,0]"; // Debug information for tile position
+    SDL_Texture* losingScreenTexture = nullptr; // Texture for losing screen
+    GuiControlButton* guiBt = nullptr; // GUI control button
+    std::vector<GuiControl*> additionalButtons; // Additional GUI buttons
+
+    // Player and entities
+    Player* player = nullptr; // Pointer to the player entity
+    std::list<Enemy*> enemyList; // List of enemies
+
+    // Game state
+    bool showLosingScreen = false; // Flag to show the losing screen
+    bool buttonsVisible = false; // Flag to toggle button visibility
     bool once = false; // Debug helper flag
-    SDL_Texture* losingScreenTexture = nullptr;
-   
 
-    //Declare a GUI Control Button
-        GuiControlButton* guiBt;
+    // Debugging and UI helpers
+    std::string tilePosDebug = "[0,0]"; // Debug information for tile position
 
-        // Almacena los botones adicionales
-        std::vector<GuiControl*> additionalButtons;
+    // Counter and fonts
+    int counter = 0; // Counter variable
+    SDL_Texture* counterTexture = nullptr; // Texture for counter text
+    TTF_Font* font = nullptr; // Font for text rendering
+    SDL_Color textColor = { 255, 255, 255, 255 }; // Text color
 
-      
-        bool buttonsVisible = false;               // Indica si los botones están visibles
+    // Audio
+    int birdsFxId = -1; // Sound effect ID for birds
 };
+
+#endif // SCENE_H
