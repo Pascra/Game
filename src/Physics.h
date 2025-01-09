@@ -28,6 +28,7 @@ enum class ColliderType {
 	ITEM,
 	PLATFORM,
 	ENEMY,
+	PROJECTILE,
 	UNKNOWN
 	// ..
 };
@@ -45,7 +46,7 @@ public:
 	float GetRotation() const;
 	bool Contains(int x, int y) const;
 	int RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y) const;
-
+	
 	
 
 public:
@@ -70,7 +71,7 @@ public:
 	bool PreUpdate();
 	bool PostUpdate();
 	bool CleanUp();
-
+	void DestroyBody(b2Body* body);
 	// Create basic physics objects
 	PhysBody* CreateRectangle(int x, int y, int width, int height, bodyType type);
 	PhysBody* CreateCircle(int x, int y, int radious, bodyType type);

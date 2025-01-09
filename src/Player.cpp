@@ -196,19 +196,19 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("Collision PLATFORM");
+	//	LOG("Collision PLATFORM");
 		// Reset the jump flag when touching the ground
 		isJumping = false;
 		break;
 	case ColliderType::ITEM:
-		LOG("Collision ITEM");
+		//LOG("Collision ITEM");
 		break;
 	case ColliderType::UNKNOWN:
-		LOG("Collision UNKNOWN");
+	//	LOG("Collision UNKNOWN");
 		break;
 	case ColliderType::ENEMY:
 	{
-		LOG("Collision with ENEMY");
+	//	LOG("Collision with ENEMY");
 
 		// Obtener la posición del jugador
 		Vector2D playerPos = GetPosition();
@@ -221,12 +221,12 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB)
 		// Considerando la altura del enemigo (texH) y un margen para ajustar la colisión
 		if (playerPos.getY() < enemyPos.getY() - (texH / 4)) {
 			// El jugador está pisando al enemigo, no se resetea
-			LOG("Player is above the ENEMY - NO Reset");
+	//		LOG("Player is above the ENEMY - NO Reset");
 		}
 		else {
 			// El jugador colisiona desde un lado o por debajo, se resetea
 			pendingToReset = true;
-			LOG("Player collided with ENEMY from the side or below - Reset");
+		//	LOG("Player collided with ENEMY from the side or below - Reset");
 		}
 		break;
 	}
@@ -241,15 +241,15 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("End Collision PLATFORM");
+		//LOG("End Collision PLATFORM");
 		Engine::GetInstance().audio.get()->PlayFx(fallFxId);
 		break;
 	case ColliderType::ITEM:
-		LOG("End Collision ITEM");
+		//LOG("End Collision ITEM");
 		Engine::GetInstance().audio.get()->PlayFx(pickCoinFxId);
 		break;
 	case ColliderType::UNKNOWN:
-		LOG("End Collision UNKNOWN");
+		//LOG("End Collision UNKNOWN");
 		break;
 	default:
 		break;

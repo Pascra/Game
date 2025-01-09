@@ -8,7 +8,8 @@ enum class EntityType
 	PLAYER,
 	ITEM,
 	UNKNOWN,
-	ENEMY
+	ENEMY,
+	PROJECTILE
 };
 
 class PhysBody;
@@ -23,7 +24,9 @@ public:
 	{
 		return true;
 	}
-
+	virtual void Draw(Render* render) {
+		// Método base vacío o implementación genérica.
+	}
 	virtual bool Start()
 	{
 		return true;

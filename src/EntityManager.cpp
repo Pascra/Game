@@ -42,16 +42,16 @@ bool EntityManager::Start() {
 
 bool EntityManager::Update(float dt) {
     ZoneScoped;
-    bool ret = true;
-
     for (auto entity : entities) {
         if (entity && entity->active) {
-            ret = entity->Update(dt);
+            if (!entity->Update(dt)) {
+                DestroyEntity(entity); // Destruir entidades no activas
+            }
         }
     }
-
-    return ret;
+    return true;
 }
+
 
 bool EntityManager::CleanUp() {
     LOG("Cleaning up Entity Manager");
@@ -106,9 +106,11 @@ void EntityManager::DestroyEntity(Entity* entity) {
 
 void EntityManager::AddEntity(Entity* entity) {
     if (entity) {
+        LOG("Entity added: Type=%d, Position=(%f, %f)", entity->type, entity->position.getX(), entity->position.getY());
         entities.push_back(entity);
     }
 }
+
 
 Player* EntityManager::GetPlayer() {
     for (auto entity : entities) {
