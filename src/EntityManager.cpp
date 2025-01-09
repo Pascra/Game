@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "tracy/Tracy.hpp"
 #include "Enemy.h"
-#include "Scene.h"
+
 
 EntityManager::EntityManager() : Module() {
     name = "entitymanager";
@@ -42,21 +42,15 @@ bool EntityManager::Start() {
 
 bool EntityManager::Update(float dt) {
     ZoneScoped;
-
-    if (Engine::GetInstance().scene->IsGamePaused()) {
-        return true; // No actualiza las entidades si el juego está en pausa
-    }
-
-    bool ret = true;
     for (auto entity : entities) {
         if (entity && entity->active) {
-            ret = entity->Update(dt);
+            if (!entity->Update(dt)) {
+                DestroyEntity(entity); // Destruir entidades no activas
+            }
         }
     }
-
-    return ret;
+    return true;
 }
-
 
 
 bool EntityManager::CleanUp() {
@@ -126,11 +120,3 @@ Player* EntityManager::GetPlayer() {
     }
     return nullptr; // Return nullptr if no player is found
 }
-
-
-void Scene::TogglePause() {
-    gamePaused = !gamePaused;
-    LOG("Game Paused: %s", gamePaused ? "True" : "False");
-}
-
-

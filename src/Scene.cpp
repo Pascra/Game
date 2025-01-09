@@ -27,12 +27,10 @@ Scene::Scene() : Module()
     font = nullptr;
     textColor = { 255, 255, 255, 255 }; // Blanco por defecto
     buttonsVisible = false;
-    gamePaused = false; // Agregar variable para controlar el estado de pausa
 
     // Inicializa enemyList como lista vacía
     enemyList = std::list<Enemy*>();
 }
-
 
 
 Scene::~Scene() {}
@@ -110,13 +108,6 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
     ZoneScoped;
-    
-    if (gamePaused) {
-        // Dibuja un mensaje de pausa o realiza acciones específicas mientras el juego está pausado
-        Engine::GetInstance().render->DrawText(font, "Game Paused", 400, 300, textColor);
-        return true; // No realizar más actualizaciones
-    }
-
 
     Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
     Engine::GetInstance().render.get()->camera.y = -(player->position.getY() - 400);
@@ -125,6 +116,20 @@ bool Scene::Update(float dt)
     if (scale <= 0) {
         LOG("Invalid scale detected, setting scale to 1.");
         scale = 1;
+    }
+
+    if (showLosingScreen) {
+        // Renderiza la pantalla de derrota
+        int windowWidth, windowHeight;
+        Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
+        SDL_Rect destRect = { 0, 0, windowWidth, windowHeight };
+        Engine::GetInstance().render.get()->DrawTexture(losingScreenTexture, 0, 0, &destRect, 1.0f, 0.0, 0, 0, true);
+
+        if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN) {
+            RestartGame();
+        }
+
+        return true;
     }
 
     // Actualiza el contador
@@ -146,7 +151,6 @@ bool Scene::Update(float dt)
     player->DrawLives();
     return true;
 }
-
 
 bool Scene::PostUpdate()
 {
@@ -256,12 +260,6 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
 {
     LOG("Press Gui Control: %d", control->id);
 
-    if (control->id == 3) { // Botón "PAUSE"
-        gamePaused = !gamePaused; // Alterna entre pausado y no pausado
-        LOG("Game paused: %s", gamePaused ? "true" : "false");
-    }
-
-
     // Detecta si el botón original fue presionado
     if (control->id == 1) // ID del botón original
     {
@@ -283,7 +281,7 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
             SDL_Rect button3Rect = { 1100, 300, 100, 40 };
 
             GuiControl* button1 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 2, "RESPAWN", button1Rect, this);
-            GuiControl* button2 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 3, "PAUSE", button2Rect, this);
+            GuiControl* button2 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 3, "LEVELS", button2Rect, this);
             GuiControl* button3 = Engine::GetInstance().guiManager->CreateGuiControl(GuiControlType::BUTTON, 4, "EXIT", button3Rect, this);
 
             additionalButtons.push_back(button1);
@@ -298,10 +296,10 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
     }
 
     // Detecta si uno de los nuevos botones fue presionado
-    if (control->id == 3) // Botón "PAUSE"
+    if (control->id == 2) // Botón "RESPAWN"
     {
-        gamePaused = !gamePaused; // Alterna el estado de pausa
-        LOG(gamePaused ? "Game Paused" : "Game Resumed");
+        LOG("Respawn Button Pressed");
+        player->ResetToInitialPosition(); // Llama al método para reiniciar la posición del jugador
     }
     else if (control->id == 4) // Botón "EXIT"
     {
@@ -311,7 +309,6 @@ bool Scene::OnGuiMouseClickEvent(GuiControl* control)
 
     return true;
 }
-
 void Scene::RestartGame()
 {
     LOG("Restarting game...");

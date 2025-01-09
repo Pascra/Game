@@ -60,9 +60,7 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt) {
     ZoneScoped;
-    if (Engine::GetInstance().scene->IsGamePaused()) {
-        return true; // Detiene las acciones de los enemigos cuando el juego está pausado
-    }
+
     // Testing pathfinding inputs for various algorithms
     if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_R) == KEY_DOWN) {
         Vector2D pos = GetPosition();

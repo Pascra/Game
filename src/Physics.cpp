@@ -9,7 +9,7 @@
 #include "Player.h"
 #include "Window.h"
 #include "box2D/box2d.h"
-#include "Scene.h"
+
 
 
 Physics::Physics() : Module()
@@ -356,16 +356,6 @@ bool Physics::CleanUp()
 
 	return true;
 }
-void Physics::Step(float dt) {
-	if (Engine::GetInstance().scene->IsGamePaused()) {
-		return; // No realiza simulación física si el juego está en pausa
-	}
-
-	if (world) {
-		world->Step(dt, velocityIterations, positionIterations);
-	}
-}
-
 
 // Callback function to collisions with Box2D
 void Physics::BeginContact(b2Contact* contact)

@@ -6,7 +6,7 @@
 #include "Render.h"
 #include "Projectile.h"
 #include "EntityManager.h"
-#include "Scene.h"
+
 #define METERS_TO_PIXELS(m) ((int)((m) * 100.0f))
 
 FlyingEnemy::FlyingEnemy() : Enemy(), shootTimer(0.0f), shootCooldown(2.0f) {
@@ -16,9 +16,6 @@ FlyingEnemy::FlyingEnemy() : Enemy(), shootTimer(0.0f), shootCooldown(2.0f) {
 FlyingEnemy::~FlyingEnemy() {}
 
 bool FlyingEnemy::Update(float dt) {
-    if (Engine::GetInstance().scene->IsGamePaused()) {
-        return true; // Detiene las acciones de los enemigos cuando el juego está pausado
-    }
     shootTimer += dt;
     LOG("FlyingEnemy shootTimer: %f", shootTimer);
 
