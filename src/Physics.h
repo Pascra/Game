@@ -84,7 +84,7 @@ public:
 
 	void DeletePhysBody(PhysBody* physBody);
 	bool IsPendingToDelete(PhysBody* physBody);
-
+	void Step(float dt);
 private:
 
 	// Debug mode
@@ -95,4 +95,7 @@ private:
 
 	// List of physics bodies
 	std::list<PhysBody*> bodiesToDelete;
+	
+	int velocityIterations = 8; // Iteraciones predeterminadas de velocidad
+	int positionIterations = 3; // Iteraciones predeterminadas de posición
 };

@@ -191,6 +191,21 @@ bool Render::PostUpdate()
     }
     return true;
 }
+void Render::DrawText(TTF_Font* font, const std::string& text, int x, int y, SDL_Color color) {
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
+    if (!surface) {
+        LOG("Error rendering text: %s", TTF_GetError());
+        return;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    SDL_Rect destRect = { x, y, surface->w, surface->h };
+    SDL_RenderCopy(renderer, texture, nullptr, &destRect);
+
+    SDL_DestroyTexture(texture);
+}
 
 // Called before quitting
 bool Render::CleanUp()

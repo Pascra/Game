@@ -36,7 +36,8 @@ public:
     bool OnGuiMouseClickEvent(GuiControl* control); // Handles GUI events
     void ShowLosingScreen(); // Display the losing screen
     void RestartGame(); // Restart the game state
-
+    bool IsGamePaused() const { return gamePaused; }
+    void TogglePause();
 private:
     // Internal helper methods
     void LoadState(); // Load the game state from a file
@@ -70,6 +71,7 @@ private:
 
     // Audio
     int birdsFxId = -1; // Sound effect ID for birds
+    bool gamePaused = false;
 };
 
 #endif // SCENE_H

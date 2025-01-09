@@ -58,6 +58,9 @@ bool Player::Start()
 bool Player::Update(float dt)
 {
 	ZoneScoped;
+	if (Engine::GetInstance().scene->IsGamePaused()) {
+		return true; // Detiene las acciones del jugador cuando el juego está pausado
+	}
 	if (pendingToReset) {
 		ResetToInitialPosition();
 		pendingToReset = false;
