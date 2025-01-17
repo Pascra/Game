@@ -293,3 +293,11 @@ void Player::ResetToInitialPosition()
 	pbody->body->SetLinearVelocity(b2Vec2(0, 0));
 }
 
+void Player::AddCoin() {
+	coinCount++;
+	LOG("Coin collected! Total coins: %d", coinCount);
+}
+
+int Player::GetCoinCount() const {
+	return coinCount;
+}

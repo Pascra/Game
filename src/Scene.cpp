@@ -91,6 +91,13 @@ bool Scene::Start()
         LOG("Failed to load font: %s", TTF_GetError());
         
     }
+    Item* coin1 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin1->SetItemType(ItemType::COIN);
+    coin1->SetPosition(Vector2D(500, 300)); // Ajusta la posición según el mapa
+
+    Item* coin2 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin2->SetItemType(ItemType::COIN);
+    coin2->SetPosition(Vector2D(700, 300)); // Ajusta la posición según el mapa
 
     counterTexture = nullptr;
     counter = 0; // Inicializa el contador
@@ -147,6 +154,25 @@ bool Scene::Update(float dt)
     // Renderiza la textura del contador
     SDL_Rect destRect = { 10, 10, 200, 50 }; // Posición y tamaño
     Engine::GetInstance().render.get()->DrawTexture(counterTexture, destRect.x, destRect.y, &destRect, 1.0f, 0.0, 0, 0, true);
+
+    Player* player = Engine::GetInstance().entityManager->GetPlayer();
+    if (player) {
+        // Texto del contador
+        std::string coinText = "Coins: " + std::to_string(player->GetCoinCount());
+        SDL_Surface* surface = TTF_RenderText_Solid(font, coinText.c_str(), textColor);
+        SDL_Texture* coinTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, surface);
+        SDL_FreeSurface(surface);
+
+        // Posición y tamaño para la esquina superior derecha
+        int windowWidth, windowHeight;
+        Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
+        SDL_Rect destRect = { windowWidth - 150, 10, 140, 50 }; // Ajustar posición y tamaño
+
+        // Dibujar el texto
+        Engine::GetInstance().render.get()->DrawTexture(coinTexture, destRect.x, destRect.y, &destRect);
+        SDL_DestroyTexture(coinTexture);
+    }
+
 
     player->DrawLives();
     return true;

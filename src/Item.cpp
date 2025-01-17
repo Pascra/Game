@@ -65,18 +65,19 @@ bool Item::Update(float dt) {
 void Item::OnCollision(PhysBody* physA, PhysBody* physB) {
     if (!isPicked && physB->ctype == ColliderType::PLAYER) {
         Player* player = Engine::GetInstance().entityManager->GetPlayer();
-        LOG("esto va");
         if (player != nullptr) {
-            LOG("esti tambe");
-            if (itemType == ItemType::HEART) {
-                player->AddLife(); // Añade una vida al jugador
-                LOG( "add life");
+            if (itemType == ItemType::COIN) {
+                player->AddCoin(); // Incrementa el contador de monedas del jugador
+            }
+            else if (itemType == ItemType::HEART) {
+                player->AddLife(); // Incrementa las vidas del jugador
             }
             isPicked = true; // Marca el ítem como recogido
             Engine::GetInstance().entityManager->DestroyEntity(this); // Destruye la entidad
         }
     }
 }
+
 
 
 

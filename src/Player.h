@@ -71,8 +71,10 @@ public:
     void RemoveLife();           // Decrementa las vidas
     void ResetLives();
     void RenderLives();
+    void AddCoin();         // Incrementa el contador de monedas
+    int GetCoinCount() const;
 private:
     int lives = 3; // Número de vidas del jugador
     SDL_Texture* heartTexture; // Textura para el corazón
-
+    int coinCount = 0;
 };
