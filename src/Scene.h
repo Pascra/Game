@@ -67,7 +67,7 @@ private:
     SDL_Texture* counterTexture = nullptr; // Texture for counter text
     TTF_Font* font = nullptr; // Font for text rendering
     SDL_Color textColor = { 255, 255, 255, 255 }; // Text color
-
+    SDL_Texture* coinTexture;
     // Audio
     int birdsFxId = -1; // Sound effect ID for birds
 };

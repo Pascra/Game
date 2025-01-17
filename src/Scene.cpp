@@ -91,6 +91,7 @@ bool Scene::Start()
         LOG("Failed to load font: %s", TTF_GetError());
         
     }
+    coinTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/goldCoin.png");
     Item* coin1 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     coin1->SetItemType(ItemType::COIN);
     coin1->SetPosition(Vector2D(500, 300)); // Ajusta la posición según el mapa
@@ -155,24 +156,26 @@ bool Scene::Update(float dt)
     SDL_Rect destRect = { 10, 10, 200, 50 }; // Posición y tamaño
     Engine::GetInstance().render.get()->DrawTexture(counterTexture, destRect.x, destRect.y, &destRect, 1.0f, 0.0, 0, 0, true);
 
-    Player* player = Engine::GetInstance().entityManager->GetPlayer();
-    if (player) {
-        // Texto del contador
-        std::string coinText = "Coins: " + std::to_string(player->GetCoinCount());
-        SDL_Surface* surface = TTF_RenderText_Solid(font, coinText.c_str(), textColor);
-        SDL_Texture* coinTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, surface);
-        SDL_FreeSurface(surface);
+    // **Renderizar la textura de la moneda**
+    int windowWidth, windowHeight;
+    Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
 
-        // Posición y tamaño para la esquina superior derecha
-        int windowWidth, windowHeight;
-        Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
-        SDL_Rect destRect = { windowWidth - 150, 10, 140, 50 }; // Ajustar posición y tamaño
+    // Posición fija para la textura de la moneda
+    SDL_Rect coinIconRect = { 50, 100, 32, 32 }; // Ajusta la posición y el tamaño de la textura
+    Engine::GetInstance().render.get()->DrawTexture(coinTexture, coinIconRect.x, coinIconRect.y, &coinIconRect, 1.0f, 0.0, 0, 0, true);
 
-        // Dibujar el texto
-        Engine::GetInstance().render.get()->DrawTexture(coinTexture, destRect.x, destRect.y, &destRect);
-        SDL_DestroyTexture(coinTexture);
-    }
+    // **Generar el texto del contador de monedas**
+    std::string coinText = ": " + std::to_string(player->GetCoinCount());
+    SDL_Surface* coinTextSurface = TTF_RenderText_Solid(font, coinText.c_str(), textColor);
+    SDL_Texture* coinTextTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, coinTextSurface);
+    SDL_FreeSurface(coinTextSurface);
 
+    // Posición fija para el texto, al lado de la textura de la moneda
+    SDL_Rect coinTextRect = { coinIconRect.x + 40, coinIconRect.y + 5, 100, 32 }; // Ajusta posición y tamaño del texto
+
+    // Renderizar el texto usando `DrawTexture`
+    Engine::GetInstance().render.get()->DrawTexture(coinTextTexture, coinTextRect.x, coinTextRect.y, &coinTextRect, 1.0f, 0.0, 0, 0, true);
+    SDL_DestroyTexture(coinTextTexture);
 
     player->DrawLives();
     return true;
