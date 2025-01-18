@@ -112,11 +112,11 @@ bool Scene::PreUpdate()
     ZoneScoped;
     return true;
 }
-
 bool Scene::Update(float dt)
 {
     ZoneScoped;
 
+    // Actualizar la posición de la cámara según el jugador
     Engine::GetInstance().render.get()->camera.x = -(player->position.getX() - 200);
     Engine::GetInstance().render.get()->camera.y = -(player->position.getY() - 400);
 
@@ -127,7 +127,7 @@ bool Scene::Update(float dt)
     }
 
     if (showLosingScreen) {
-        // Renderiza la pantalla de derrota
+        // Renderizar pantalla de derrota
         int windowWidth, windowHeight;
         Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
         SDL_Rect destRect = { 0, 0, windowWidth, windowHeight };
@@ -140,46 +140,51 @@ bool Scene::Update(float dt)
         return true;
     }
 
-    // Actualiza el contador
-    counter += dt * 10;
+    // **Renderizar el contador de segundos (estático)**
+    counter += dt;
 
-    // Genera la textura del contador
-    std::string counterText = "Counter: " + std::to_string((int)counter);
+    std::string counterText = "Timer: " + std::to_string((int)counter);
     SDL_Surface* surface = TTF_RenderText_Solid(font, counterText.c_str(), textColor);
+
     if (counterTexture) {
-        SDL_DestroyTexture(counterTexture); // Elimina la textura anterior
+        SDL_DestroyTexture(counterTexture);
     }
+
     counterTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, surface);
     SDL_FreeSurface(surface);
 
-    // Renderiza la textura del contador
-    SDL_Rect destRect = { 10, 10, 200, 50 }; // Posición y tamaño
-    Engine::GetInstance().render.get()->DrawTexture(counterTexture, destRect.x, destRect.y, &destRect, 1.0f, 0.0, 0, 0, true);
+    SDL_Rect timerRect = { 10, 10, 200, 50 }; // Posición fija
+    Engine::GetInstance().render.get()->DrawTexture(counterTexture, timerRect.x, timerRect.y, &timerRect, 1.0f, 0.0, 0, 0, true);
 
-    // **Renderizar la textura de la moneda**
-    int windowWidth, windowHeight;
-    Engine::GetInstance().window.get()->GetWindowSize(windowWidth, windowHeight);
+    // **Renderizar el contador de monedas (estático)**
+    if (coinTexture == nullptr) {
+        LOG("Coin texture not loaded correctly.");
+    }
+    else {
+        // Dibujar el ícono de la moneda
+        SDL_Rect coinIconRect = { 50, 50, 32, 32 }; // Ajusta posición y tamaño
+        Engine::GetInstance().render.get()->DrawTexture(coinTexture, coinIconRect.x, coinIconRect.y, &coinIconRect, 1.0f, 0.0, 0, 0, true);
 
-    // Posición fija para la textura de la moneda
-    SDL_Rect coinIconRect = { 50, 100, 32, 32 }; // Ajusta la posición y el tamaño de la textura
-    Engine::GetInstance().render.get()->DrawTexture(coinTexture, coinIconRect.x, coinIconRect.y, &coinIconRect, 1.0f, 0.0, 0, 0, true);
+        // Generar y renderizar el texto del contador de monedas
+        std::string coinText = ": " + std::to_string(player->GetCoinCount());
+        SDL_Surface* coinTextSurface = TTF_RenderText_Solid(font, coinText.c_str(), textColor);
+        SDL_Texture* coinTextTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, coinTextSurface);
+        SDL_FreeSurface(coinTextSurface);
 
-    // **Generar el texto del contador de monedas**
-    std::string coinText = ": " + std::to_string(player->GetCoinCount());
-    SDL_Surface* coinTextSurface = TTF_RenderText_Solid(font, coinText.c_str(), textColor);
-    SDL_Texture* coinTextTexture = SDL_CreateTextureFromSurface(Engine::GetInstance().render.get()->renderer, coinTextSurface);
-    SDL_FreeSurface(coinTextSurface);
+        SDL_Rect coinTextRect = { coinIconRect.x + 40, coinIconRect.y, 100, 32 };
+        Engine::GetInstance().render.get()->DrawTexture(coinTextTexture, coinTextRect.x, coinTextRect.y, &coinTextRect, 1.0f, 0.0, 0, 0, true);
 
-    // Posición fija para el texto, al lado de la textura de la moneda
-    SDL_Rect coinTextRect = { coinIconRect.x + 40, coinIconRect.y + 5, 100, 32 }; // Ajusta posición y tamaño del texto
+        SDL_DestroyTexture(coinTextTexture);
+    }
 
-    // Renderizar el texto usando `DrawTexture`
-    Engine::GetInstance().render.get()->DrawTexture(coinTextTexture, coinTextRect.x, coinTextRect.y, &coinTextRect, 1.0f, 0.0, 0, 0, true);
-    SDL_DestroyTexture(coinTextTexture);
-
+    // **Dibujar las vidas del jugador**
     player->DrawLives();
+
     return true;
 }
+
+
+
 
 bool Scene::PostUpdate()
 {

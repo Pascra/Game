@@ -233,9 +233,9 @@ void Render::ResetViewPort()
 }
 
 // Draw a texture to the screen
-bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivotX, int pivotY) const
+bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivotX, int pivotY, bool ignoreCamera) const
 {
-    if (renderer == nullptr || texture == nullptr) {
+    if (!renderer || !texture) {
         LOG("Cannot draw texture. Renderer or texture is null.");
         return false;
     }
@@ -244,10 +244,18 @@ bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* sec
     if (scale <= 0) scale = 1;
 
     SDL_Rect rect;
-    rect.x = (int)(camera.x * speed) + x * scale;
-    rect.y = (int)(camera.y * speed) + y * scale;
 
-    if (section != nullptr) {
+    // Determina las coordenadas basadas en ignoreCamera
+    if (ignoreCamera) {
+        rect.x = x * scale; // Coordenadas absolutas
+        rect.y = y * scale;
+    }
+    else {
+        rect.x = (int)(camera.x * speed) + x * scale; // Coordenadas relativas a la cámara
+        rect.y = (int)(camera.y * speed) + y * scale;
+    }
+
+    if (section) {
         rect.w = section->w;
         rect.h = section->h;
     }
@@ -274,6 +282,50 @@ bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* sec
 
     return true;
 }
+
+
+
+
+void Render::DrawStaticTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section, double angle, int pivotX, int pivotY) const
+{
+    if (renderer == nullptr || texture == nullptr) {
+        LOG("Cannot draw texture. Renderer or texture is null.");
+        return;
+    }
+
+    int scale = Engine::GetInstance().window.get()->GetScale();
+    if (scale <= 0) scale = 1;
+
+    SDL_Rect rect;
+    rect.x = x * scale; // Coordenadas absolutas
+    rect.y = y * scale;
+
+    if (section != nullptr) {
+        rect.w = section->w;
+        rect.h = section->h;
+    }
+    else {
+        SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+    }
+
+    rect.w *= scale;
+    rect.h *= scale;
+
+    SDL_Point* p = nullptr;
+    SDL_Point pivot;
+
+    if (pivotX != INT_MAX && pivotY != INT_MAX) {
+        pivot.x = pivotX;
+        pivot.y = pivotY;
+        p = &pivot;
+    }
+
+    if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0) {
+        LOG("Cannot blit to screen. SDL_RenderCopyEx error: %s", SDL_GetError());
+    }
+}
+
+
 
 // Draw a rectangle
 bool Render::DrawRectangle(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool filled, bool use_camera) const

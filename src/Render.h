@@ -36,7 +36,9 @@ public:
     void ResetViewPort();
 
     // Draw a texture to the screen
-    bool DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = nullptr, float speed = 1.0f, double angle = 0, int pivotX = INT_MAX, int pivotY = INT_MAX) const;
+    bool DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = nullptr, float speed = 1.0f, double angle = 0.0, int pivotX = INT_MAX, int pivotY = INT_MAX, bool useCamera = true) const;
+
+    void DrawStaticTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section = nullptr, double angle = 0.0, int pivotX = INT_MAX, int pivotY = INT_MAX) const;
 
     // Draw a rectangle to the screen
     bool DrawRectangle(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255, bool filled = true, bool useCamera = true) const;
