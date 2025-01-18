@@ -92,13 +92,45 @@ bool Scene::Start()
         
     }
     coinTexture = Engine::GetInstance().textures.get()->Load("Assets/Textures/goldCoin.png");
+
     Item* coin1 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     coin1->SetItemType(ItemType::COIN);
-    coin1->SetPosition(Vector2D(500, 300)); // Ajusta la posición según el mapa
+    coin1->SetPosition(Vector2D(355, 336));
 
     Item* coin2 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
     coin2->SetItemType(ItemType::COIN);
-    coin2->SetPosition(Vector2D(700, 300)); // Ajusta la posición según el mapa
+    coin2->SetPosition(Vector2D(500, 300)); // Ajusta la posición según el mapa
+
+    Item* coin3 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin3->SetItemType(ItemType::COIN);
+    coin3->SetPosition(Vector2D(700, 300)); // Ajusta la posición según el mapa
+
+    Item* coin4 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin4->SetItemType(ItemType::COIN);
+    coin4->SetPosition(Vector2D(937, 336));
+
+    Item* coin5 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin5->SetItemType(ItemType::COIN);
+    coin5->SetPosition(Vector2D(1058, 304));
+
+    Item* coin6 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin6->SetItemType(ItemType::COIN);
+    coin6->SetPosition(Vector2D(1431, 272));
+
+    Item* coin7 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin7->SetItemType(ItemType::COIN);
+    coin7->SetPosition(Vector2D(1744, 432));
+
+    Item* coin8 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    coin8->SetItemType(ItemType::COIN);
+    coin8->SetPosition(Vector2D(2126, 304));
+
+   
+
+   
+
+   
+
 
     counterTexture = nullptr;
     counter = 0; // Inicializa el contador
