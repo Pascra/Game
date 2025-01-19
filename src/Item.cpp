@@ -32,8 +32,12 @@ bool Item::Start() {
     case ItemType::HEART:
         texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Heart2.png");
         break;
+        case ItemType::JUMP_BOOST:
+        jumpBoostForce = 2.0f;       // Fuerza más moderada
+        jumpBoostDuration = 10000.0f;    // Duración más corta
+        texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Watermelon.png");
+        break;
     }
-
     // Configurar tamaño y cuerpo físico
     Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
     pbody = Engine::GetInstance().physics.get()->CreateCircle(
@@ -44,8 +48,7 @@ bool Item::Start() {
     );
 
     pbody->ctype = ColliderType::ITEM;
-    pbody->listener = this; // Asegúrate de que este listener está asignado
-
+    pbody->listener = this; // Asignar el listener
     return true;
 }
 
@@ -72,11 +75,16 @@ void Item::OnCollision(PhysBody* physA, PhysBody* physB) {
             else if (itemType == ItemType::HEART) {
                 player->AddLife(); // Incrementa las vidas del jugador
             }
+            else if (itemType == ItemType::JUMP_BOOST) {
+                player->ActivateJumpBoost(jumpBoostForce, jumpBoostDuration);
+            }
+
             isPicked = true; // Marca el ítem como recogido
             Engine::GetInstance().entityManager->DestroyEntity(this); // Destruye la entidad
         }
     }
 }
+
 
 
 

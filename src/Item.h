@@ -5,7 +5,8 @@
 
 enum class ItemType {
     COIN,
-    HEART
+    HEART,
+    JUMP_BOOST
 };
 
 class Item : public Entity {
@@ -28,7 +29,10 @@ private:
     int texW, texH;
 
     PhysBody* pbody;
-
+    float jumpBoostForce = 5.0f; // Fuerza adicional para el salto
+    float jumpBoostDuration = 10.0f;
+    
 public:
     bool isPicked = false; // Atributo para marcar si el ítem ha sido recogido
+   
 };

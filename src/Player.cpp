@@ -62,6 +62,23 @@ bool Player::Update(float dt)
 		ResetToInitialPosition();
 		pendingToReset = false;
 	}
+	if (isJumpBoostActive) {
+		jumpBoostTimer -= dt;
+		if (jumpBoostTimer < 0) {
+			jumpBoostTimer = 0; // Evita valores negativos
+		}
+		
+
+		if (jumpBoostTimer == 0) {
+			jumpForce = originalJumpForce;
+			isJumpBoostActive = false;
+			LOG("Jump Boost Deactivated. Restoring original jump force: %f", jumpForce);
+		}
+	}
+
+
+
+
 
 	// L08 TODO 5: Add physics to the player - updated player position using physics
 	b2Vec2 velocity = b2Vec2(0, pbody->body->GetLinearVelocity().y);
@@ -301,3 +318,14 @@ void Player::AddCoin() {
 int Player::GetCoinCount() const {
 	return coinCount;
 }
+void Player::ActivateJumpBoost(float boostForce, float duration) {
+	if (!isJumpBoostActive) {
+		originalJumpForce = jumpForce; // Guarda la fuerza original
+		jumpForce += boostForce;      // Incrementa la fuerza
+		isJumpBoostActive = true;     // Activa el estado
+		jumpBoostTimer = duration;    // Establece la duración
+		LOG("Jump Boost Activated! New jump force: %f for %f seconds", jumpForce, duration);
+	}
+}
+
+

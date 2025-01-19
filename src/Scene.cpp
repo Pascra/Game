@@ -125,7 +125,10 @@ bool Scene::Start()
     coin8->SetItemType(ItemType::COIN);
     coin8->SetPosition(Vector2D(2126, 304));
 
-   
+    Item* jumpBoost = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    jumpBoost->SetItemType(ItemType::JUMP_BOOST);
+    jumpBoost->SetPosition(Vector2D(1577, 272));
+
 
    
 

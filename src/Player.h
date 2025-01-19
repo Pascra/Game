@@ -65,7 +65,7 @@ public:
 
     bool pendingToReset = false;
     void DrawLives();
-
+    void ActivateJumpBoost(float boostForce, float duration);
     int GetLives() const; // Obtener vidas actuales
     void AddLife();       // Incrementar vidas
     void RemoveLife();           // Decrementa las vidas
@@ -77,4 +77,9 @@ private:
     int lives = 3; // Número de vidas del jugador
     SDL_Texture* heartTexture; // Textura para el corazón
     int coinCount = 0;
+
+    bool isJumpBoostActive = false;   // Indica si el boost de salto está activo
+    float jumpBoostTimer = 0.0f;      // Temporizador para el boost
+    float originalJumpForce = 0.0f;
+
 };
