@@ -37,6 +37,10 @@ bool Item::Start() {
         jumpBoostDuration = 10000.0f;    // Duración más corta
         texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Watermelon.png");
         break;
+        case ItemType::CHECKPOINT:
+            texture = Engine::GetInstance().textures.get()->Load("Assets/Textures/Checkpoint.png");
+            break;
+
     }
     // Configurar tamaño y cuerpo físico
     Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
@@ -78,6 +82,13 @@ void Item::OnCollision(PhysBody* physA, PhysBody* physB) {
             else if (itemType == ItemType::JUMP_BOOST) {
                 player->ActivateJumpBoost(jumpBoostForce, jumpBoostDuration);
             }
+            else if (itemType == ItemType::CHECKPOINT) {
+                player->SetCheckpoint(position); // Guarda la posición del checkpoint
+                LOG("Checkpoint activated at position: (%f, %f)", position.getX(), position.getY());
+                isPicked = true; // Marca como recogido
+                Engine::GetInstance().entityManager->DestroyEntity(this); // Si el checkpoint desaparece tras activarse
+            }
+
 
             isPicked = true; // Marca el ítem como recogido
             Engine::GetInstance().entityManager->DestroyEntity(this); // Destruye la entidad

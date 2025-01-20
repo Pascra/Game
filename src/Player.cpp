@@ -286,29 +286,36 @@ Vector2D Player::GetPosition()
 	return pos;
 }
 
-void Player::ResetToInitialPosition()
-{
-	LOG("Player died and respawned.");
+void Player::ResetToInitialPosition() {
+	if (lives > 0) {
+		// Si el jugador tiene más de 0 vidas
+		lives--;
 
-	// Reducir vidas
-	lives--;
-
-	if (lives <= 0)
-	{
-		LOG("Player ran out of lives! Showing LosingScreen...");
-		Scene* scene = Engine::GetInstance().scene.get(); // Usar .get() para obtener el puntero crudo
-		if (scene != nullptr)
-		{
-			scene->ShowLosingScreen(); // Llama al método para mostrar la pantalla de derrota
+		if (hasCheckpoint) {
+			// Respawn en el último checkpoint
+			SetPosition(checkpointPosition);
+			LOG("Respawned at checkpoint: (%f, %f)", checkpointPosition.getX(), checkpointPosition.getY());
 		}
-		return;
-	}
+		else {
+			// Respawn en la posición inicial
+			SetPosition(initialPosition);
+			LOG("Respawned at initial position: (%f, %f)", initialPosition.getX(), initialPosition.getY());
+		}
 
-	// Restablecer posición y velocidad
-	SetPosition(initialPosition);
-	isJumping = false;
-	pbody->body->SetLinearVelocity(b2Vec2(0, 0));
+		isJumping = false;
+		pbody->body->SetLinearVelocity(b2Vec2(0, 0));
+	}
+	else {
+		// Sin vidas: Mostrar pantalla de derrota
+		LOG("Player ran out of lives! Showing LosingScreen...");
+		Scene* scene = Engine::GetInstance().scene.get();
+		if (scene != nullptr) {
+			scene->ShowLosingScreen(); // Muestra la pantalla de derrota
+		}
+	}
 }
+
+
 
 void Player::AddCoin() {
 	coinCount++;
@@ -328,4 +335,9 @@ void Player::ActivateJumpBoost(float boostForce, float duration) {
 	}
 }
 
+void Player::SetCheckpoint(const Vector2D& position) {
+	checkpointPosition = position;
+	hasCheckpoint = true;
+	LOG("Checkpoint set at: (%f, %f)", checkpointPosition.getX(), checkpointPosition.getY());
+}
 

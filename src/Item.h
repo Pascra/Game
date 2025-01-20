@@ -6,7 +6,8 @@
 enum class ItemType {
     COIN,
     HEART,
-    JUMP_BOOST
+    JUMP_BOOST,
+    CHECKPOINT
 };
 
 class Item : public Entity {

@@ -129,6 +129,14 @@ bool Scene::Start()
     jumpBoost->SetItemType(ItemType::JUMP_BOOST);
     jumpBoost->SetPosition(Vector2D(1577, 272));
 
+    Item* checkpoint1 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    checkpoint1->SetItemType(ItemType::CHECKPOINT);
+    checkpoint1->SetPosition(Vector2D(911, 336)); 
+
+    Item* checkpoint2 = (Item*)Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM);
+    checkpoint2->SetItemType(ItemType::CHECKPOINT);
+    checkpoint2->SetPosition(Vector2D(1534, 272));
+
 
    
 

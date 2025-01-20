@@ -73,6 +73,7 @@ public:
     void RenderLives();
     void AddCoin();         // Incrementa el contador de monedas
     int GetCoinCount() const;
+    void SetCheckpoint(const Vector2D& position);
 private:
     int lives = 3; // Número de vidas del jugador
     SDL_Texture* heartTexture; // Textura para el corazón
@@ -81,5 +82,7 @@ private:
     bool isJumpBoostActive = false;   // Indica si el boost de salto está activo
     float jumpBoostTimer = 0.0f;      // Temporizador para el boost
     float originalJumpForce = 0.0f;
+    Vector2D checkpointPosition;  // Posición del último checkpoint
+    bool hasCheckpoint = false;
 
 };
